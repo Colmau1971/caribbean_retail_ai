@@ -707,7 +707,76 @@ def build_regional_dataset():
         ignore_index=True,
         sort=False
     )
+    # ==========================================
+    # BRAND CORRECTIONS
+    # ==========================================
 
+    try:
+
+        corrections = pd.read_csv(
+            "brand_corrections.csv"
+        )
+
+        corrections.columns = [
+            c.strip()
+            for c in corrections.columns
+        ]
+
+        regional_df["product_name"] = (
+            regional_df["product_name"]
+            .astype(str)
+            .str.strip()
+        )
+
+        corrections["product_name"] = (
+            corrections["product_name"]
+            .astype(str)
+            .str.strip()
+        )
+
+        regional_df["brand_original"] = (
+            regional_df["brand"]
+        )
+
+        regional_df = regional_df.merge(
+            corrections[["product_name", "Marca"]],
+            on="product_name",
+            how="left"
+        )
+
+        regional_df["brand"] = (
+            regional_df["Marca"]
+            .fillna(regional_df["brand"])
+            .astype(str)
+            .str.strip()
+        )
+
+        regional_df.drop(
+            columns=["Marca"],
+            inplace=True
+        )
+
+        print("Brand corrections applied.")
+
+    except Exception as e:
+
+        print(f"Brand correction error: {e}")
+
+    # ==========================================
+    # REMOVE "OTHER" BRANDS
+    # ==========================================
+
+    regional_df = regional_df[
+        regional_df["brand"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        != "other"
+    ]
+
+    print('Removed brand "Other".')
+    
+   
     regional_df.columns = [
         str(c).strip().lower()
         for c in regional_df.columns

@@ -48,7 +48,7 @@ CATEGORIAS = {
         "keywords": [
             "pan", "bagel", "brioche",
             "naan", "pita", "flatbread",
-            "croissant"
+            "croissant", "tostada",
         ]
     },
 
@@ -88,7 +88,7 @@ MARCAS = [
     "Mi Trigo", "Molino del Sol",
     "Canyon", "Nature's Own",
     "Natures Own", "Bauducco",
-    "Bauduc", "Bimbo", "Sara Lee",
+    "Bauduco", "Bimbo", "Sara Lee",
     "Pepperidge Farm", "Arnold",
     "Wonder", "Martin's",
 
@@ -103,7 +103,28 @@ MARCAS = [
     "Qiin", "Best", "Crich",
     "Pirulin", "Ferrero",
     "Duetto", "Bergen",
-    "Chips Ahoy", "YPM"
+    "Chips Ahoy", "YPM",
+    
+    # Mexico / Bakery / Tortillas
+    "Tia Rosa",
+    "Tía Rosa",
+    "Sanissimo",
+    "Saníssimo",
+    "Mission",
+    "Guerrero",
+
+    # Bakery USA
+    "Oroweat",
+    "Thomas",
+    "Brownberry",
+    "Dave's Killer Bread",
+
+    # Sweet Bakery
+    "Bauducco",
+
+    # Healthy
+    "Simple Mills",
+    "Mary's Gone Crackers",
 ]
 
 # =====================================================
@@ -262,7 +283,10 @@ def detectar_marca(nombre):
 
     for marca in marcas_ordenadas:
 
-        if marca.lower() in nombre.lower():
+        if re.search(
+            rf"\b{re.escape(marca.lower())}\b",
+            nombre.lower()
+        ):
             return marca
 
     return "N/A"
