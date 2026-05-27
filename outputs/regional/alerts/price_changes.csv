@@ -1,4 +1,5 @@
 ﻿country,retailer,match_key,brand_current,product_name_current,price_usd_current,brand_previous,product_name_previous,price_usd_previous,_merge,price_change_pct
+Dominican Republic,Bravo,2100003088215,Bravo,Bravo Tortilla Trigo,1.08,Bravo,Bravo Tortilla Trigo Integral,1.25,both,-13.599999999999996
 Dominican Republic,Bravo,2100003088215,Bravo,Bravo Tortilla Trigo,1.08,La Real,La Real Street Tacos Trigo,2.68,both,-59.70149253731343
 Dominican Republic,Bravo,2100003088215,Bravo,Bravo Tortilla Trigo,1.08,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,both,-80.47016274864376
 Dominican Republic,Bravo,2100003088215,Bravo,Bravo Tortilla Trigo,1.08,Toufayan,Wrap Integral Toufayan,2.36,both,-54.23728813559322
@@ -7,122 +8,115 @@ Dominican Republic,Bravo,2100003088215,Bravo,Bravo Tortilla Trigo Integral,1.25,
 Dominican Republic,Bravo,2100003088215,Bravo,Bravo Tortilla Trigo Integral,1.25,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,both,-77.39602169981917
 Dominican Republic,Bravo,2100003088215,Bravo,Bravo Tortilla Trigo Integral,1.25,Toufayan,Wrap Integral Toufayan,2.36,both,-47.03389830508474
 Dominican Republic,Bravo,2100003088215,La Real,La Real Street Tacos Trigo,2.68,Bravo,Bravo Tortilla Trigo,1.08,both,148.14814814814815
+Dominican Republic,Bravo,2100003088215,La Real,La Real Street Tacos Trigo,2.68,Bravo,Bravo Tortilla Trigo Integral,1.25,both,114.4
 Dominican Republic,Bravo,2100003088215,La Real,La Real Street Tacos Trigo,2.68,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,both,-51.5370705244123
 Dominican Republic,Bravo,2100003088215,La Real,La Real Street Tacos Trigo,2.68,Toufayan,Wrap Integral Toufayan,2.36,both,13.559322033898319
 Dominican Republic,Bravo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,Bravo,Bravo Tortilla Trigo,1.08,both,412.037037037037
+Dominican Republic,Bravo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,Bravo,Bravo Tortilla Trigo Integral,1.25,both,342.40000000000003
 Dominican Republic,Bravo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,La Real,La Real Street Tacos Trigo,2.68,both,106.34328358208955
 Dominican Republic,Bravo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,Toufayan,Wrap Integral Toufayan,2.36,both,134.3220338983051
 Dominican Republic,Bravo,2100003088215,Toufayan,Wrap Integral Toufayan,2.36,Bravo,Bravo Tortilla Trigo,1.08,both,118.51851851851849
+Dominican Republic,Bravo,2100003088215,Toufayan,Wrap Integral Toufayan,2.36,Bravo,Bravo Tortilla Trigo Integral,1.25,both,88.79999999999998
 Dominican Republic,Bravo,2100003088215,Toufayan,Wrap Integral Toufayan,2.36,La Real,La Real Street Tacos Trigo,2.68,both,-11.940298507462696
 Dominican Republic,Bravo,2100003088215,Toufayan,Wrap Integral Toufayan,2.36,Old El Paso,Tortilla De Trigo 6 Old El Paso,5.53,both,-57.32368896925859
-Dominican Republic,Bravo,2100003088239,Bravo,Bravo Tortilla Wrap Espinaca Med,2.04,Old El Paso,Tortilla De Trigo 8 Old El Paso,5.85,both,-65.12820512820512
-Dominican Republic,Bravo,2100003088239,Bravo,Bravo Tortilla Wrap Tomate Med,2.04,Old El Paso,Tortilla De Trigo 8 Old El Paso,5.85,both,-65.12820512820512
+Dominican Republic,Bravo,2100003088239,Bravo,Bravo Burrito Mediano,1.57,Bravo,Bravo Tortilla Wrap Espinaca Med,2.04,both,-23.03921568627451
+Dominican Republic,Bravo,2100003088239,Bravo,Bravo Burrito Mediano,1.57,Bravo,Bravo Tortilla Wrap Tomate Med,2.04,both,-23.03921568627451
+Dominican Republic,Bravo,2100003088239,Bravo,Bravo Burrito Mediano,1.57,Toufayan,Wraps Sabor Espinaca Toufayan,2.36,both,-33.474576271186436
+Dominican Republic,Bravo,2100003088239,Bravo,Bravo Tortilla Wrap Espinaca Med,2.04,Toufayan,Wraps Sabor Espinaca Toufayan,2.36,both,-13.5593220338983
+Dominican Republic,Bravo,2100003088239,Bravo,Bravo Tortilla Wrap Tomate Med,2.04,Toufayan,Wraps Sabor Espinaca Toufayan,2.36,both,-13.5593220338983
 Dominican Republic,Bravo,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.36,Bravo,Bravo Tortilla Wrap Espinaca Med,2.04,both,15.686274509803914
 Dominican Republic,Bravo,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.36,Bravo,Bravo Tortilla Wrap Tomate Med,2.04,both,15.686274509803914
-Dominican Republic,Bravo,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.36,Old El Paso,Tortilla De Trigo 8 Old El Paso,5.85,both,-59.65811965811966
 Dominican Republic,Bravo,7466478200053,Bravo,Bravo Tortillas Maiz,1.57,La Real,La Real Street Tacos Maiz,2.2,both,-28.636363636363637
 Dominican Republic,Bravo,7466478200053,Bravo,Bravo Tortillas Maiz,1.57,La Real,La Real Tortillas Mexicanas,2.36,both,-33.474576271186436
-Dominican Republic,Bravo,7466478200053,Bravo,Bravo Tortillas Maiz,1.57,La Real,Tostada De Maiz Mexicana La Real,3.09,both,-49.190938511326856
-Dominican Republic,Bravo,7466478200053,La Real,La Real Street Tacos Maiz,2.2,La Real,La Real Tortillas Mexicanas,2.36,both,-6.77966101694914
-Dominican Republic,Bravo,7466478200053,La Real,La Real Street Tacos Maiz,2.2,La Real,Tostada De Maiz Mexicana La Real,3.09,both,-28.802588996763745
+Dominican Republic,Bravo,7466478200053,La Real,La Real Tortillas Mexicanas,2.36,Bravo,Bravo Tortillas Maiz,1.57,both,50.31847133757961
 Dominican Republic,Bravo,7466478200053,La Real,La Real Tortillas Mexicanas,2.36,La Real,La Real Street Tacos Maiz,2.2,both,7.272727272727258
-Dominican Republic,Bravo,7466478200053,La Real,La Real Tortillas Mexicanas,2.36,La Real,Tostada De Maiz Mexicana La Real,3.09,both,-23.624595469255663
+Dominican Republic,Bravo,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.09,Bravo,Bravo Tortillas Maiz,1.57,both,96.8152866242038
+Dominican Republic,Bravo,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.09,La Real,La Real Street Tacos Maiz,2.2,both,40.45454545454544
+Dominican Republic,Bravo,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.09,La Real,La Real Tortillas Mexicanas,2.36,both,30.93220338983051
 Dominican Republic,Jumbo,2100003088215,Tortilla,Tortilla De Taco Lider,1.09,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.53,both,-75.93818984547461
 Dominican Republic,Jumbo,2100003088215,Tortilla,Tortilla De Taco Lider,1.09,Toufayan,Wrap Integral Toufayan,2.38,both,-54.20168067226891
+Dominican Republic,Jumbo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.53,Tortilla,Tortilla De Taco Lider,1.09,both,315.5963302752294
 Dominican Republic,Jumbo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.53,Toufayan,Wrap Integral Toufayan,2.38,both,90.33613445378154
+Dominican Republic,Jumbo,2100003088215,Toufayan,Wrap Integral Toufayan,2.38,Tortilla,Tortilla De Taco Lider,1.09,both,118.348623853211
 Dominican Republic,Jumbo,2100003088215,Toufayan,Wrap Integral Toufayan,2.38,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.53,both,-47.46136865342164
-Dominican Republic,Jumbo,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.82,both,-37.55186721991702
-Dominican Republic,Jumbo,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,110.48951048951048
+Dominican Republic,Jumbo,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,La Real,Tortilla De Trigo Grande La Real,3.01,both,-52.49169435215947
+Dominican Republic,Jumbo,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,-46.84014869888476
+Dominican Republic,Jumbo,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,Toufayan,Wrap Keto Toufayan,4.12,both,-65.29126213592234
 Dominican Republic,Jumbo,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,11.895910780669139
 Dominican Republic,Jumbo,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Toufayan,Wrap Keto Toufayan,4.12,both,-26.94174757281554
-Dominican Republic,Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.82,both,-44.19087136929461
-Dominican Republic,Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,88.11188811188812
 Dominican Republic,Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,La Real,Tortilla De Trigo Grande La Real,3.01,both,-10.631229235880395
 Dominican Republic,Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Toufayan,Wrap Keto Toufayan,4.12,both,-34.70873786407767
-Dominican Republic,Jumbo,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.82,both,-14.522821576763489
-Dominican Republic,Jumbo,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,188.11188811188813
-Dominican Republic,Jumbo,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,La Real,Tortilla De Trigo Grande La Real,3.01,both,36.87707641196015
-Dominican Republic,Jumbo,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,53.159851301115246
 Dominican Republic,Jumbo,7466478200053,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,Maria,Tortilla De Maiz Taco Maria,1.82,both,39.01098901098899
-Dominican Republic,Jumbo,7466478200053,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,La Real,Tostada De Maiz Mexicana La Real,3.09,both,-18.12297734627832
-Dominican Republic,Jumbo,7466478200053,Maria,Tortilla De Maiz Taco Maria,1.82,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,both,-28.06324110671936
-Dominican Republic,Jumbo,7466478200053,Maria,Tortilla De Maiz Taco Maria,1.82,La Real,Tostada De Maiz Mexicana La Real,3.09,both,-41.10032362459546
+Dominican Republic,Jumbo,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.09,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,both,22.13438735177866
+Dominican Republic,Jumbo,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.09,Maria,Tortilla De Maiz Taco Maria,1.82,both,69.78021978021977
 Dominican Republic,Jumbo,7467502800119,Pan,Pan De Hot Dog Lumijor,1.63,Pan,Pan De Hot Dog Lumijor,2.04,both,-20.09803921568628
 Dominican Republic,Jumbo,7467502800119,Pan,Pan De Hot Dog Lumijor,2.04,Pan,Pan De Hot Dog Lumijor,1.63,both,25.153374233128844
 Dominican Republic,Merca Jumbo,2100003088215,Tortilla,Tortilla De Taco Lider,1.08,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.5,both,-76.0
 Dominican Republic,Merca Jumbo,2100003088215,Tortilla,Tortilla De Taco Lider,1.08,Toufayan,Wrap Integral Toufayan,2.36,both,-54.23728813559322
+Dominican Republic,Merca Jumbo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.5,Tortilla,Tortilla De Taco Lider,1.08,both,316.66666666666663
 Dominican Republic,Merca Jumbo,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.5,Toufayan,Wrap Integral Toufayan,2.36,both,90.67796610169493
+Dominican Republic,Merca Jumbo,2100003088215,Toufayan,Wrap Integral Toufayan,2.36,Tortilla,Tortilla De Taco Lider,1.08,both,118.51851851851849
 Dominican Republic,Merca Jumbo,2100003088215,Toufayan,Wrap Integral Toufayan,2.36,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.5,both,-47.55555555555556
-Dominican Republic,Merca Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,3.07,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.79,both,-35.908141962421716
-Dominican Republic,Merca Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,3.07,Tortilla,Tortilla De Trigo Burrito Lider,1.41,both,117.7304964539007
+Dominican Republic,Merca Jumbo,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.41,Food Club,Tortillas De Trigo Integral Food Club,3.07,both,-54.071661237785015
+Dominican Republic,Merca Jumbo,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.41,Toufayan,Wrap Keto Toufayan,3.3,both,-57.27272727272727
+Dominican Republic,Merca Jumbo,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.41,Toufayan,Wraps Sabor Espinaca Toufayan,2.5,both,-43.60000000000001
 Dominican Republic,Merca Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,3.07,Toufayan,Wrap Keto Toufayan,3.3,both,-6.969696969696971
-Dominican Republic,Merca Jumbo,2100003088239,Toufayan,Wrap Keto Toufayan,3.3,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.79,both,-31.106471816283932
-Dominican Republic,Merca Jumbo,2100003088239,Toufayan,Wrap Keto Toufayan,3.3,Tortilla,Tortilla De Trigo Burrito Lider,1.41,both,134.04255319148936
-Dominican Republic,Merca Jumbo,2100003088239,Toufayan,Wrap Keto Toufayan,3.3,Food Club,Tortillas De Trigo Integral Food Club,3.07,both,7.491856677524429
-Dominican Republic,Merca Jumbo,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.5,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.79,both,-47.80793319415449
-Dominican Republic,Merca Jumbo,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.5,Tortilla,Tortilla De Trigo Burrito Lider,1.41,both,77.3049645390071
+Dominican Republic,Merca Jumbo,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,3.07,Toufayan,Wraps Sabor Espinaca Toufayan,2.5,both,22.799999999999994
 Dominican Republic,Merca Jumbo,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.5,Food Club,Tortillas De Trigo Integral Food Club,3.07,both,-18.56677524429967
 Dominican Republic,Merca Jumbo,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.5,Toufayan,Wrap Keto Toufayan,3.3,both,-24.24242424242424
 Dominican Republic,Merca Jumbo,7466478200053,Food Club,Tortilla De Maiz Para Tacos Food Club,2.68,Maria,Tortilla De Maiz Taco Maria,1.81,both,48.066298342541444
-Dominican Republic,Merca Jumbo,7466478200053,Food Club,Tortilla De Maiz Para Tacos Food Club,2.68,La Real,Tostada De Maiz Mexicana La Real,3.07,both,-12.70358306188924
-Dominican Republic,Merca Jumbo,7466478200053,Maria,Tortilla De Maiz Taco Maria,1.81,Food Club,Tortilla De Maiz Para Tacos Food Club,2.68,both,-32.46268656716418
-Dominican Republic,Merca Jumbo,7466478200053,Maria,Tortilla De Maiz Taco Maria,1.81,La Real,Tostada De Maiz Mexicana La Real,3.07,both,-41.04234527687296
+Dominican Republic,Merca Jumbo,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.07,Food Club,Tortilla De Maiz Para Tacos Food Club,2.68,both,14.552238805970136
+Dominican Republic,Merca Jumbo,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.07,Maria,Tortilla De Maiz Taco Maria,1.81,both,69.61325966850828
 Dominican Republic,Nacional,2100003088215,Tortilla,Tortilla De Taco Lider,1.09,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.55,both,-76.04395604395606
 Dominican Republic,Nacional,2100003088215,Tortilla,Tortilla De Taco Lider,1.09,Toufayan,Wrap Integral Toufayan,2.38,both,-54.20168067226891
+Dominican Republic,Nacional,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.55,Tortilla,Tortilla De Taco Lider,1.09,both,317.43119266055044
 Dominican Republic,Nacional,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.55,Toufayan,Wrap Integral Toufayan,2.38,both,91.17647058823529
+Dominican Republic,Nacional,2100003088215,Toufayan,Wrap Integral Toufayan,2.38,Tortilla,Tortilla De Taco Lider,1.09,both,118.348623853211
 Dominican Republic,Nacional,2100003088215,Toufayan,Wrap Integral Toufayan,2.38,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.55,both,-47.69230769230769
-Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.83,both,-37.68115942028986
-Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,110.48951048951048
+Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,La Real,Tortilla De Trigo Grande La Real,3.01,both,-52.49169435215947
+Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,both,-73.46938775510205
+Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,-46.84014869888476
+Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,Toufayan,Wrap Keto Toufayan,4.12,both,-65.29126213592234
+Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,both,-43.25396825396825
+Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla De Trigo Burrito Lider,1.43,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,both,-39.91596638655462
 Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,both,-44.15584415584416
 Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,11.895910780669139
 Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Toufayan,Wrap Keto Toufayan,4.12,both,-26.94174757281554
-Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Wrap,Wrap Powergreen La Tortilla Fact,5.78,both,-47.92387543252596
+Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,both,19.444444444444436
 Dominican Republic,Nacional,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,both,26.470588235294112
-Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.83,both,11.594202898550716
-Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,276.9230769230769
 Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,La Real,Tortilla De Trigo Grande La Real,3.01,both,79.06976744186048
 Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,100.3717472118959
 Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,Toufayan,Wrap Keto Toufayan,4.12,both,30.82524271844659
-Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,Wrap,Wrap Powergreen La Tortilla Fact,5.78,both,-6.747404844290666
+Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,both,113.88888888888889
 Dominican Republic,Nacional,2100003088239,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,both,126.47058823529412
-Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.83,both,-44.306418219461705
-Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,88.11188811188812
 Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,La Real,Tortilla De Trigo Grande La Real,3.01,both,-10.631229235880395
 Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,both,-50.09276437847866
 Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Toufayan,Wrap Keto Toufayan,4.12,both,-34.70873786407767
-Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Wrap,Wrap Powergreen La Tortilla Fact,5.78,both,-53.46020761245674
+Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,both,6.7460317460317425
 Dominican Republic,Nacional,2100003088239,Food Club,Tortillas De Trigo Integral Food Club,2.69,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,both,13.025210084033617
-Dominican Republic,Nacional,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.83,both,-14.699792960662524
-Dominican Republic,Nacional,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,188.11188811188813
-Dominican Republic,Nacional,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,La Real,Tortilla De Trigo Grande La Real,3.01,both,36.87707641196015
-Dominican Republic,Nacional,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,both,-23.5621521335807
-Dominican Republic,Nacional,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,53.159851301115246
-Dominican Republic,Nacional,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Wrap,Wrap Powergreen La Tortilla Fact,5.78,both,-28.719723183391004
-Dominican Republic,Nacional,2100003088239,Toufayan,Wrap Keto Toufayan,4.12,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,both,73.109243697479
-Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.83,both,-47.82608695652174
-Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,76.22377622377623
+Dominican Republic,Nacional,2100003088239,Wrap,Wrap Powergreen La Tortilla Fact,5.78,La Real,Tortilla De Trigo Grande La Real,3.01,both,92.02657807308972
+Dominican Republic,Nacional,2100003088239,Wrap,Wrap Powergreen La Tortilla Fact,5.78,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,both,7.235621521335818
+Dominican Republic,Nacional,2100003088239,Wrap,Wrap Powergreen La Tortilla Fact,5.78,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,114.86988847583643
+Dominican Republic,Nacional,2100003088239,Wrap,Wrap Powergreen La Tortilla Fact,5.78,Toufayan,Wrap Keto Toufayan,4.12,both,40.29126213592234
+Dominican Republic,Nacional,2100003088239,Wrap,Wrap Powergreen La Tortilla Fact,5.78,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,both,129.36507936507937
+Dominican Republic,Nacional,2100003088239,Wrap,Wrap Powergreen La Tortilla Fact,5.78,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,both,142.8571428571429
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,La Real,Tortilla De Trigo Grande La Real,3.01,both,-16.279069767441854
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,both,-53.246753246753244
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,-6.319702602230482
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,Toufayan,Wrap Keto Toufayan,4.12,both,-38.83495145631068
-Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,Wrap,Wrap Powergreen La Tortilla Fact,5.78,both,-56.40138408304498
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,both,5.882352941176476
-Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,Old El Paso,Tortilla De Trigo 8 Old El Paso,4.83,both,-50.72463768115942
-Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,Tortilla,Tortilla De Trigo Burrito Lider,1.43,both,66.43356643356644
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,La Real,Tortilla De Trigo Grande La Real,3.01,both,-20.930232558139533
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,Tortilla,Tortilla Zero Car La Tortilla Fact,5.39,both,-55.84415584415584
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,Food Club,Tortillas De Trigo Integral Food Club,2.69,both,-11.524163568773236
 Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,Toufayan,Wrap Keto Toufayan,4.12,both,-42.23300970873787
-Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,Wrap,Wrap Powergreen La Tortilla Fact,5.78,both,-58.82352941176471
+Dominican Republic,Nacional,2100003088239,Toufayan,Wraps Sabor Tomate Seco Toufayan,2.38,Toufayan,Wraps Sabor Espinaca Toufayan,2.52,both,-5.55555555555556
 Dominican Republic,Nacional,7466478200053,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,La Real,Tortilla De Maiz Taco La Real,1.41,both,79.43262411347517
 Dominican Republic,Nacional,7466478200053,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,Maria,Tortilla De Maiz Taco Maria,1.82,both,39.01098901098899
-Dominican Republic,Nacional,7466478200053,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,La Real,Tostada De Maiz Mexicana La Real,2.69,both,-5.947955390334577
 Dominican Republic,Nacional,7466478200053,La Real,Tortilla De Maiz Taco La Real,1.41,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,both,-44.26877470355731
 Dominican Republic,Nacional,7466478200053,La Real,Tortilla De Maiz Taco La Real,1.41,Maria,Tortilla De Maiz Taco Maria,1.82,both,-22.527472527472533
-Dominican Republic,Nacional,7466478200053,La Real,Tortilla De Maiz Taco La Real,1.41,La Real,Tostada De Maiz Mexicana La Real,2.69,both,-47.583643122676584
-Dominican Republic,Nacional,7466478200053,Maria,Tortilla De Maiz Taco Maria,1.82,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,both,-28.06324110671936
-Dominican Republic,Nacional,7466478200053,Maria,Tortilla De Maiz Taco Maria,1.82,La Real,Tortilla De Maiz Taco La Real,1.41,both,29.078014184397176
-Dominican Republic,Nacional,7466478200053,Maria,Tortilla De Maiz Taco Maria,1.82,La Real,Tostada De Maiz Mexicana La Real,2.69,both,-32.342007434944236
+Dominican Republic,Nacional,7466478200053,La Real,Tostada De Maiz Mexicana La Real,2.69,Food Club,Tortilla De Maiz Para Tacos Food Club,2.53,both,6.324110671936765
+Dominican Republic,Nacional,7466478200053,La Real,Tostada De Maiz Mexicana La Real,2.69,La Real,Tortilla De Maiz Taco La Real,1.41,both,90.78014184397163
+Dominican Republic,Nacional,7466478200053,La Real,Tostada De Maiz Mexicana La Real,2.69,Maria,Tortilla De Maiz Taco Maria,1.82,both,47.802197802197796
 Dominican Republic,Sirena,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.52,Wala,Tortilla Trigo Tradicional Wala,1.08,both,318.5185185185185
 Dominican Republic,Sirena,2100003088215,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.52,Toufayan,Wrap Integral Toufayan,2.38,both,89.91596638655462
 Dominican Republic,Sirena,2100003088215,Wala,Tortilla Trigo Tradicional Wala,1.08,Old El Paso,Tortilla De Trigo 6 Old El Paso,4.52,both,-76.10619469026548
@@ -132,43 +126,14 @@ Dominican Republic,Sirena,2100003088215,Toufayan,Wrap Integral Toufayan,2.38,Wal
 Dominican Republic,Sirena,2100003088239,La Real,Tortilla De Trigo Grande La Real,3.01,Wala,Tortilla Trigo Burrito Wala,1.43,both,110.48951048951048
 Dominican Republic,Sirena,2100003088239,Wala,Tortilla Trigo Burrito Wala,1.43,La Real,Tortilla De Trigo Grande La Real,3.01,both,-52.49169435215947
 Dominican Republic,Sirena,7466478200053,La Real,Tortilla De Maiz Taco La Real,1.41,El Charrito,Tortilla El Charrito Maiz Amarillo,1.27,both,11.023622047244086
-Dominican Republic,Sirena,7466478200053,La Real,Tortilla De Maiz Taco La Real,1.41,La Real,Tostada De Maiz Mexicana La Real,3.09,both,-54.36893203883495
 Dominican Republic,Sirena,7466478200053,El Charrito,Tortilla El Charrito Maiz Amarillo,1.27,La Real,Tortilla De Maiz Taco La Real,1.41,both,-9.929078014184391
-Dominican Republic,Sirena,7466478200053,El Charrito,Tortilla El Charrito Maiz Amarillo,1.27,La Real,Tostada De Maiz Mexicana La Real,3.09,both,-58.89967637540453
+Dominican Republic,Sirena,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.09,La Real,Tortilla De Maiz Taco La Real,1.41,both,119.14893617021276
+Dominican Republic,Sirena,7466478200053,La Real,Tostada De Maiz Mexicana La Real,3.09,El Charrito,Tortilla El Charrito Maiz Amarillo,1.27,both,143.30708661417322
 Dominican Republic,,2100002860560,Members Selection,Members Selection Pastel De Vainilla Recien Horneado 20 A 24 Porciones,14.18,Members Selection,Members Selection Pastel De Vainilla Recien Horneado 40 A 50 Porciones,25.19,both,-43.707820563715764
 Dominican Republic,,2100002860560,Members Selection,Members Selection Pastel De Vainilla Recien Horneado 40 A 50 Porciones,25.19,Members Selection,Members Selection Pastel De Vainilla Recien Horneado 20 A 24 Porciones,14.18,both,77.64456981664317
-Guyana,Massy Stores Guyana,bermudez_bermudez bourbon cream cookies_unknown,Bermudez,BERMUDEZ BOURBON CREAM COOKIES PACK,3.4615384615384617,Bermudez,Bermudez Bourbon Cream Cookies,0.3125,both,1007.6923076923076
-Guyana,Massy Stores Guyana,bermudez_bermudez bourbon cream cookies_unknown,Bermudez,Bermudez Bourbon Cream Cookies,0.3125,Bermudez,BERMUDEZ BOURBON CREAM COOKIES PACK,3.4615384615384617,both,-90.97222222222221
-Guyana,Massy Stores Guyana,bermudez_bermudez dixee peanut butter filled_unknown,Bermudez,BERMUDEZ DIXEE PEANUT BUTTER FILLED,3.8461538461538463,Bermudez,Bermudez Dixee Peanut Butter Filled,0.625,both,515.3846153846155
-Guyana,Massy Stores Guyana,bermudez_bermudez domino vanilla_unknown,Bermudez,BERMUDEZ DOMINO VANILLA,2.980769230769231,Bermudez,Bermudez Domino Vanilla,0.5048076923076923,both,490.4761904761905
-Guyana,Massy Stores Guyana,bermudez_bermudez domino vanilla_unknown,Bermudez,Bermudez Domino Vanilla,0.5048076923076923,Bermudez,BERMUDEZ DOMINO VANILLA,2.980769230769231,both,-83.06451612903226
-Guyana,Massy Stores Guyana,charles_charles jordan almonds_unknown,Charles,Charles Jordan Almonds,2.548076923076923,Charles,Charles Jordan Almonds,1.3461538461538465,both,89.28571428571422
-Guyana,Massy Stores Guyana,charles_charles jordan almonds_unknown,Charles,Charles Jordan Almonds,1.3461538461538465,Charles,Charles Jordan Almonds,2.548076923076923,both,-47.169811320754704
-Guyana,Massy Stores Guyana,noel_noel festival chocolate_unknown,Noel,NOEL FESTIVAL CHOCOLATE,0.3365384615384615,Noel,NOEL FESTIVAL CHOCOLATE,3.942307692307693,both,-91.46341463414633
-Guyana,Massy Stores Guyana,noel_noel festival chocolate_unknown,Noel,NOEL FESTIVAL CHOCOLATE,3.942307692307693,Noel,NOEL FESTIVAL CHOCOLATE,0.3365384615384615,both,1071.4285714285718
-Guyana,Massy Stores Guyana,oh_oh snacks quinoa_unknown,Oh,Oh Snacks Quinoa,5.576923076923077,Oh,Oh Snacks Quinoa,12.35576923076923,both,-54.86381322957198
-Guyana,Massy Stores Guyana,oh_oh snacks quinoa_unknown,Oh,Oh Snacks Quinoa,12.35576923076923,Oh,Oh Snacks Quinoa,5.576923076923077,both,121.55172413793103
-Guyana,Massy Stores Guyana,otis_otis spunkmeyer banana nut muffins_unknown,Otis,OTIS SPUNKMEYER  BANANA NUT MUFFINS,7.115384615384615,Otis,OTIS SPUNKMEYER BANANA NUT MUFFINS,1.4423076923076923,both,393.3333333333333
-Guyana,Massy Stores Guyana,otis_otis spunkmeyer banana nut muffins_unknown,Otis,OTIS SPUNKMEYER BANANA NUT MUFFINS,1.4423076923076923,Otis,OTIS SPUNKMEYER  BANANA NUT MUFFINS,7.115384615384615,both,-79.72972972972973
-Guyana,Massy Stores Guyana,pepperidge_pepperidge farm goldfish cheddar_unknown,Pepperidge,PEPPERIDGE FARM GOLDFISH CHEDDAR,1.2019230769230769,Pepperidge,Pepperidge Farm Goldfish Cheddar,0.8653846153846154,both,38.88888888888888
-Guyana,Massy Stores Guyana,pepperidge_pepperidge farm goldfish cheddar_unknown,Pepperidge,Pepperidge Farm Goldfish Cheddar,0.8653846153846154,Pepperidge,PEPPERIDGE FARM GOLDFISH CHEDDAR,1.2019230769230769,both,-27.999999999999993
 Guyana,Massy Stores Guyana,pringles_pringles pizza_unknown,Pringles,PRINGLES PIZZA,4.038461538461538,Pringles,Pringles Pizza,2.355769230769231,both,71.42857142857142
 Guyana,Massy Stores Guyana,pringles_pringles pizza_unknown,Pringles,Pringles Pizza,2.355769230769231,Pringles,PRINGLES PIZZA,4.038461538461538,both,-41.666666666666664
 Guyana,Massy Stores Guyana,sunshine_sunshine cashew nuts light salt_unknown,Sunshine,Sunshine Cashew Nuts Light Salt,1.7788461538461535,Sunshine,Sunshine Cashew Nuts Light Salt,1.1057692307692308,both,60.86956521739126
 Guyana,Massy Stores Guyana,sunshine_sunshine cashew nuts light salt_unknown,Sunshine,Sunshine Cashew Nuts Light Salt,1.1057692307692308,Sunshine,Sunshine Cashew Nuts Light Salt,1.7788461538461535,both,-37.837837837837824
 Guyana,Massy Stores Guyana,sunshine_sunshine peanuts salted_unknown,Sunshine,Sunshine Peanuts Salted,1.2980769230769231,Sunshine,Sunshine Peanuts Salted,0.3846153846153846,both,237.50000000000006
 Guyana,Massy Stores Guyana,sunshine_sunshine peanuts salted_unknown,Sunshine,Sunshine Peanuts Salted,0.3846153846153846,Sunshine,Sunshine Peanuts Salted,1.2980769230769231,both,-70.37037037037037
-Guyana,Massy Stores Guyana,toppers_toppers caramel popcorn_unknown,Toppers,Toppers Caramel Popcorn,4.326923076923077,Toppers,Toppers Caramel Popcorn,1.0576923076923077,both,309.09090909090907
-Guyana,Massy Stores Guyana,toppers_toppers caramel popcorn_unknown,Toppers,Toppers Caramel Popcorn,1.0576923076923077,Toppers,Toppers Caramel Popcorn,4.326923076923077,both,-75.55555555555556
-Guyana,Massy Stores Guyana,toppers_toppers frosted popcorn_unknown,Toppers,Toppers Frosted Popcorn,4.326923076923077,Toppers,Toppers Frosted Popcorn,1.1057692307692308,both,291.30434782608694
-Guyana,Massy Stores Guyana,toppers_toppers frosted popcorn_unknown,Toppers,Toppers Frosted Popcorn,1.1057692307692308,Toppers,Toppers Frosted Popcorn,4.326923076923077,both,-74.44444444444444
-Guyana,Massy Stores Guyana,toppers_toppers kettle popcorn_unknown,Toppers,Toppers Kettle Popcorn,4.134615384615385,Toppers,Toppers Kettle Popcorn,1.0576923076923077,both,290.90909090909093
-Guyana,Massy Stores Guyana,toppers_toppers kettle popcorn_unknown,Toppers,Toppers Kettle Popcorn,1.0576923076923077,Toppers,Toppers Kettle Popcorn,4.134615384615385,both,-74.4186046511628
-Guyana,Massy Stores Guyana,triskits_triskits vanilla crackers_unknown,Triskits,TRISKITS VANILLA CRACKERS,1.6105769230769231,Triskits,TRISKITS VANILLA CRACKERS,1.3461538461538465,both,19.642857142857117
-Guyana,Massy Stores Guyana,triskits_triskits vanilla crackers_unknown,Triskits,TRISKITS VANILLA CRACKERS,1.6105769230769231,Triskits,TRISKITS VANILLA CRACKERS,0.5769230769230769,both,179.16666666666669
-Guyana,Massy Stores Guyana,triskits_triskits vanilla crackers_unknown,Triskits,TRISKITS VANILLA CRACKERS,1.3461538461538465,Triskits,TRISKITS VANILLA CRACKERS,1.6105769230769231,both,-16.417910447761177
-Guyana,Massy Stores Guyana,triskits_triskits vanilla crackers_unknown,Triskits,TRISKITS VANILLA CRACKERS,1.3461538461538465,Triskits,TRISKITS VANILLA CRACKERS,0.5769230769230769,both,133.33333333333343
-Guyana,Massy Stores Guyana,triskits_triskits vanilla crackers_unknown,Triskits,TRISKITS VANILLA CRACKERS,0.5769230769230769,Triskits,TRISKITS VANILLA CRACKERS,1.6105769230769231,both,-64.17910447761194
-Guyana,Massy Stores Guyana,triskits_triskits vanilla crackers_unknown,Triskits,TRISKITS VANILLA CRACKERS,0.5769230769230769,Triskits,TRISKITS VANILLA CRACKERS,1.3461538461538465,both,-57.14285714285716
-Guyana,Massy Stores Guyana,wibisco_wibisco tea time chocolate_unknown,Wibisco,Wibisco Tea Time Chocolate,4.086538461538462,Wibisco,Wibisco Tea Time Chocolate,0.4326923076923077,both,844.4444444444445
-Guyana,Massy Stores Guyana,wibisco_wibisco tea time chocolate_unknown,Wibisco,Wibisco Tea Time Chocolate,0.4326923076923077,Wibisco,Wibisco Tea Time Chocolate,4.086538461538462,both,-89.41176470588236

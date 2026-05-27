@@ -2,32 +2,33 @@ CARIBBEAN RETAIL INTELLIGENCE ENGINE
 ====================================
 
 1. Top marcas regionales
-     brand  sku_count  countries  categories  avg_price_kg
-       Pan         73          1           1      4.067674
-   Guarina         64          1           1     10.983571
-     Maria         46          1           1           NaN
-    Hatuey         44          1           1           NaN
-  Toufayan         38          3           2      9.945590
-Pepperidge         30          2           2     19.380820
-     Jumbo         28          1           2     12.970592
-  Sunshine         27          1           2     17.213601
-      Dino         26          1           1           NaN
-     Aviva         24          1           1           NaN
+          brand  sku_count  countries  categories  avg_price_kg
+            Pan         73          1           1      4.067674
+        Guarina         64          1           1     10.983571
+       Toufayan         48          3           2     10.117546
+          Maria         46          1           1           NaN
+         Hatuey         44          1           1           NaN
+          Jumbo         32          2           3     12.998873
+       Sunshine         27          1           2     17.213601
+           Dino         26          1           1           NaN
+          Aviva         24          1           1           NaN
+Pepperidge Farm         22          2           2     15.981186
 
 2. Gaps RD vs Guyana
 standard_category     Aruba  Dominican Republic    Guyana  gap_guyana_vs_rd_%
-           Bakery 13.150765            4.067674 20.339107          400.018072
-          Cookies       NaN            9.468023 16.043441           69.448685
-Tortillas & Wraps 13.304589            9.818108 14.417373           46.844719
-         Crackers       NaN                 NaN 10.465246                 NaN
+           Bakery 13.076875            4.067674 19.484692          379.013071
+          Cookies       NaN            9.468023 17.009751           79.654727
+Tortillas & Wraps 14.579299            9.818108 15.586344           58.750997
+         Crackers       NaN                 NaN  7.160319                 NaN
        Pasteleria       NaN           95.054000       NaN                 NaN
-           Snacks       NaN                 NaN 24.723335                 NaN
+           Snacks       NaN                 NaN 22.941947                 NaN
 
 3. Alertas de entrada mercado
-       type          category                                                                                          message priority
-Premium Gap            Bakery Guyana presenta precio/kg 400.0% superior a RD. Posible oportunidad premium o mercado importado.     Alta
-Premium Gap           Cookies  Guyana presenta precio/kg 69.4% superior a RD. Posible oportunidad premium o mercado importado.     Alta
-Premium Gap Tortillas & Wraps  Guyana presenta precio/kg 46.8% superior a RD. Posible oportunidad premium o mercado importado.     Alta
+          type          category                                                                                          message priority
+   Premium Gap            Bakery Guyana presenta precio/kg 379.0% superior a RD. Posible oportunidad premium o mercado importado.     Alta
+   Premium Gap           Cookies  Guyana presenta precio/kg 79.7% superior a RD. Posible oportunidad premium o mercado importado.     Alta
+   Premium Gap Tortillas & Wraps  Guyana presenta precio/kg 58.8% superior a RD. Posible oportunidad premium o mercado importado.     Alta
+Low Assortment          Crackers                                   Guyana tiene baja profundidad de surtido en Crackers (8 SKUs).    Media
 3B. Same SKU Cross Country
 No se encontraron SKUs con barcode compartido entre países.
 

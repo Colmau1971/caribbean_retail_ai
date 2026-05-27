@@ -554,27 +554,94 @@ def parse_product_cards(
 # =========================
 
 def infer_brand(product_name: str):
+
     if not product_name:
         return None
 
-    known_brands = [
-        "Oreo", "Nabisco", "Sunshine", "Kiss", "Crix", "Holiday",
-        "Pringles", "Doritos", "Lays", "Lay's", "Ritz", "Kellogg",
-        "Nature Valley", "Pepperidge", "Bimbo", "Tia Rosa",
-        "Mission", "Old El Paso", "Quaker", "Nestle", "Cadbury",
-        "Hershey", "McVitie", "Gamesa", "Marinela", "Entenmann",
-        "Sara Lee", "Wonder", "Blue Ribbon", "National", "Nissin",
-        "Diana", "Tosh", "Club Social", "Chips Ahoy", "Belvita",
-        "Tuc", "Excelsior", "Toufayan"
-    ]
+    name_clean = (
+        str(product_name)
+        .lower()
+        .replace("-", " ")
+        .strip()
+    )
 
-    lower = product_name.lower()
+    BRAND_KEYWORDS = {
 
-    for brand in known_brands:
-        if brand.lower() in lower:
+        # BIMBO
+        "tia rosa": "Tía Rosa",
+        "sanissimo": "Saníssimo",
+        "bimbo": "Bimbo",
+        "takis": "Takis",
+
+        # MONDELEZ
+        "oreo": "Oreo",
+        "ritz": "Ritz",
+        "belvita": "Belvita",
+        "chips ahoy": "Chips Ahoy",
+        "triscuit": "Triscuit",
+        "club social": "Club Social",
+        "tuc": "Tuc",
+
+        # PEPSICO
+        "lays": "Lays",
+        "lay's": "Lays",
+        "doritos": "Doritos",
+        "cheetos": "Cheetos",
+        "tostitos": "Tostitos",
+        "pringles": "Pringles",
+        "sun chips": "Sun Chips",
+
+        # CAMPBELL
+        "pepperidge": "Pepperidge Farm",
+        "goldfish": "Goldfish",
+
+        # GRUMA
+        "mission": "Mission",
+
+        # BIMBO / LATAM
+        "marinela": "Marinela",
+        "gamesa": "Gamesa",
+
+        # TOUFAYAN
+        "toufayan": "Toufayan",
+
+        # REGIONALES
+        "sunshine": "Sunshine",
+        "crix": "Crix",
+        "kiss": "Kiss",
+        "holiday": "Holiday",
+
+        # GENERAL
+        "nature valley": "Nature Valley",
+        "wonder": "Wonder",
+        "sara lee": "Sara Lee",
+        "thomas": "Thomas",
+        "entenmann": "Entenmann",
+        "old el paso": "Old El Paso",
+        "quaker": "Quaker",
+        "nabisco": "Nabisco",
+        "bauducco": "Bauducco",
+        "mcvitie": "McVitie",
+        "kellogg": "Kellogg",
+        "jumbo": "Jumbo",
+        "stacy's": "Stacy's",
+        "hershey": "Hershey",
+        "cadbury": "Cadbury",
+        "nestle": "Nestlé",
+        "blue ribbon": "Blue Ribbon",
+        "national": "National",
+        "nissin": "Nissin",
+        "diana": "Diana",
+        "tosh": "Tosh",
+        "excelsior": "Excelsior",
+    }
+
+    for keyword, brand in BRAND_KEYWORDS.items():
+
+        if keyword in name_clean:
             return brand
 
-    return product_name.split()[0] if product_name.split() else None
+    return "Other"
 
 
 def convert_to_kg(value: float, unit: str):

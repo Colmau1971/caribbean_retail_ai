@@ -222,47 +222,69 @@ def infer_brand(name):
     if not name:
         return None
 
-    known = [
-        "Oreo",
-        "Nabisco",
-        "Ritz",
-        "Mission",
-        "Toufayan",
-        "Bimbo",
-        "Tia Rosa",
-        "Sara Lee",
-        "Wonder",
-        "Nature Valley",
-        "Pringles",
-        "Doritos",
-        "Lays",
-        "Lay's",
-        "Quaker",
-        "Pepperidge",
-        "Thomas",
-        "Entenmann",
-        "Old El Paso",
-        "McVitie",
-        "Kellogg",
-        "Belvita",
-        "Sun Chips",
-        "Goldfish",
-        "Stacy's",
-        "Jumbo",
-    ]
+    name_clean = (
+        str(name)
+        .lower()
+        .replace("-", " ")
+        .strip()
+    )
 
-    lower = name.lower()
+    BRAND_KEYWORDS = {
 
-    for brand in known:
+        # BIMBO
+        "tia rosa": "Tía Rosa",
+        "sanissimo": "Saníssimo",
+        "bimbo": "Bimbo",
+        "takis": "Takis",
 
-        if brand.lower() in lower:
+        # MONDELEZ
+        "oreo": "Oreo",
+        "ritz": "Ritz",
+        "belvita": "Belvita",
+        "chips ahoy": "Chips Ahoy",
+        "triscuit": "Triscuit",
+
+        # PEPSICO
+        "lays": "Lays",
+        "lay's": "Lays",
+        "doritos": "Doritos",
+        "cheetos": "Cheetos",
+        "tostitos": "Tostitos",
+        "pringles": "Pringles",
+        "sun chips": "Sun Chips",
+
+        # CAMPBELL
+        "pepperidge": "Pepperidge Farm",
+        "goldfish": "Goldfish",
+
+        # GRUMA
+        "mission": "Mission",
+
+        # TOUFAYAN
+        "toufayan": "Toufayan",
+
+        # GENERAL
+        "nature valley": "Nature Valley",
+        "wonder": "Wonder",
+        "sara lee": "Sara Lee",
+        "thomas": "Thomas",
+        "entenmann": "Entenmann",
+        "old el paso": "Old El Paso",
+        "quaker": "Quaker",
+        "nabisco": "Nabisco",
+        "bauducco": "Bauducco",
+        "mcvitie": "McVitie",
+        "kellogg": "Kellogg",
+        "jumbo": "Jumbo",
+        "stacy's": "Stacy's",
+    }
+
+    for keyword, brand in BRAND_KEYWORDS.items():
+
+        if keyword in name_clean:
             return brand
 
-    return (
-        name.split()[0]
-        if name.split()
-        else None
-    )
+    return "Other"
 
 
 def classify_category(name, source_category):

@@ -83,21 +83,67 @@ def convert_to_kg(value, unit):
 
 
 def infer_brand(name):
+
     if not name:
         return None
 
-    known = [
-        "Oreo", "Nabisco", "Ritz", "Mission", "Toufayan", "Bimbo", "Tia Rosa",
-        "Sara Lee", "Wonder", "Nature Valley", "Pringles", "Doritos", "Lays",
-        "Quaker", "Pepperidge", "Thomas", "Entenmann", "Old El Paso"
-    ]
+    name_clean = (
+        str(name)
+        .lower()
+        .replace("-", " ")
+        .strip()
+    )
 
-    lower = name.lower()
-    for brand in known:
-        if brand.lower() in lower:
+    BRAND_KEYWORDS = {
+
+        # BIMBO
+        "tia rosa": "Tía Rosa",
+        "sanissimo": "Saníssimo",
+        "bimbo": "Bimbo",
+        "takis": "Takis",
+
+        # MONDELEZ
+        "oreo": "Oreo",
+        "ritz": "Ritz",
+        "belvita": "Belvita",
+        "chips ahoy": "Chips Ahoy",
+        "triscuit": "Triscuit",
+
+        # PEPSICO
+        "lays": "Lays",
+        "doritos": "Doritos",
+        "cheetos": "Cheetos",
+        "tostitos": "Tostitos",
+        "pringles": "Pringles",
+
+        # CAMPBELL
+        "pepperidge": "Pepperidge Farm",
+        "goldfish": "Goldfish",
+
+        # GRUMA
+        "mission": "Mission",
+
+        # TOUFAYAN
+        "toufayan": "Toufayan",
+
+        # GENERAL
+        "nature valley": "Nature Valley",
+        "wonder": "Wonder",
+        "sara lee": "Sara Lee",
+        "thomas": "Thomas",
+        "entenmann": "Entenmann",
+        "old el paso": "Old El Paso",
+        "quaker": "Quaker",
+        "nabisco": "Nabisco",
+        "bauducco": "Bauducco",
+    }
+
+    for keyword, brand in BRAND_KEYWORDS.items():
+
+        if keyword in name_clean:
             return brand
 
-    return name.split()[0] if name.split() else None
+    return "Other"
 
 
 def classify_category(name, source_category):
