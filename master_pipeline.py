@@ -206,7 +206,90 @@ def detect_segment(name):
         return "Value"
 
     return "Mass"
+    
+def clean_product_name(
+    name,
+    brand=None
+):
 
+    if pd.isna(name):
+        return None
+
+    clean = str(name)
+
+    # =========================
+    # LOWER
+    # =========================
+
+    clean = clean.lower()
+
+    # =========================
+    # REMOVE CURRENCY / PRICES
+    # =========================
+
+    clean = re.sub(
+        r"(rd\$|usd|\$|ƒ|€)\s?\d+([.,]\d+)?",
+        "",
+        clean,
+        flags=re.IGNORECASE
+    )
+
+    # =========================
+    # REMOVE WEIGHTS
+    # =========================
+
+    clean = re.sub(
+        r"\b\d+([.,]\d+)?\s?(oz|lb|lbs|g|gr|kg|ml|l|ea|pack|ct)\b",
+        "",
+        clean,
+        flags=re.IGNORECASE
+    )
+
+    # =========================
+    # REMOVE PACK EXPRESSIONS
+    # =========================
+
+    clean = re.sub(
+        r"\b\d+\s?(paq|pack|und|unidades|count|ct)\b",
+        "",
+        clean,
+        flags=re.IGNORECASE
+    )
+
+    # =========================
+    # REMOVE SYMBOLS
+    # =========================
+
+    clean = re.sub(
+        r"[\|\-,;/()]",
+        " ",
+        clean
+    )
+
+    # =========================
+    # REMOVE BRAND
+    # =========================
+
+    if brand and brand != "Other":
+
+        clean = re.sub(
+            rf"\b{re.escape(str(brand).lower())}\b",
+            "",
+            clean,
+            flags=re.IGNORECASE
+        )
+
+    # =========================
+    # REMOVE EXTRA SPACES
+    # =========================
+
+    clean = re.sub(
+        r"\s+",
+        " ",
+        clean
+    ).strip()
+
+    return clean.title()
 
 def standardize_category(value):
 
@@ -520,6 +603,18 @@ def safe_load_csv(path, country):
 
         if "country" not in df.columns:
             df["country"] = country
+            
+       # =========================
+        # CLEAN PRODUCT NAME
+        # =========================
+
+        df["product_name_clean"] = df.apply(
+            lambda x: clean_product_name(
+                x["product_name"],
+                x["brand"]
+            ),
+            axis=1
+        )    
 
         # =========================
         # CLEAN TEXT
@@ -927,7 +1022,7 @@ def build_regional_dataset():
     def family_key(row):
 
         brand = normalize_sku_text(row.get("brand", ""))
-        name = normalize_sku_text(row.get("product_name", ""))
+        name = normalize_sku_text(row.get("product_name_clean", ""))
 
         tokens = name.split()
 

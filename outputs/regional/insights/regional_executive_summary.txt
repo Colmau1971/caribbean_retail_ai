@@ -3,32 +3,35 @@ CARIBBEAN RETAIL INTELLIGENCE ENGINE
 
 1. Top marcas regionales
           brand  sku_count  countries  categories  avg_price_kg
-            Pan         73          1           1      4.067674
+          Jumbo        143          2           4     16.637853
         Guarina         64          1           1     10.983571
-       Toufayan         48          3           2     10.117546
+       Toufayan         50          3           2     10.181731
+Pepperidge Farm         48          2           3     20.202281
           Maria         46          1           1           NaN
          Hatuey         44          1           1           NaN
-          Jumbo         32          2           3     12.998873
+           Oreo         33          3           2    572.461816
+       Pringles         30          2           2     25.878762
        Sunshine         27          1           2     17.213601
            Dino         26          1           1           NaN
-          Aviva         24          1           1           NaN
-Pepperidge Farm         22          2           2     15.981186
 
 2. Gaps RD vs Guyana
-standard_category     Aruba  Dominican Republic    Guyana  gap_guyana_vs_rd_%
-           Bakery 13.076875            4.067674 19.484692          379.013071
-          Cookies       NaN            9.468023 17.009751           79.654727
-Tortillas & Wraps 14.579299            9.818108 15.586344           58.750997
-         Crackers       NaN                 NaN  7.160319                 NaN
-       Pasteleria       NaN           95.054000       NaN                 NaN
-           Snacks       NaN                 NaN 22.941947                 NaN
+standard_category      Aruba  Dominican Republic    Guyana  gap_guyana_vs_rd_%
+          Cookies  18.745566            9.549157 23.678995          147.969495
+Tortillas & Wraps  16.511301            9.209429 15.586344           69.243340
+           Bakery 154.467440                 NaN 19.484692                 NaN
+         Crackers  20.692968                 NaN  7.160319                 NaN
+       Pasteleria        NaN          114.412500       NaN                 NaN
+           Snacks  24.549023                 NaN 23.303328                 NaN
 
 3. Alertas de entrada mercado
           type          category                                                                                          message priority
-   Premium Gap            Bakery Guyana presenta precio/kg 379.0% superior a RD. Posible oportunidad premium o mercado importado.     Alta
-   Premium Gap           Cookies  Guyana presenta precio/kg 79.7% superior a RD. Posible oportunidad premium o mercado importado.     Alta
-   Premium Gap Tortillas & Wraps  Guyana presenta precio/kg 58.8% superior a RD. Posible oportunidad premium o mercado importado.     Alta
+   Premium Gap           Cookies Guyana presenta precio/kg 148.0% superior a RD. Posible oportunidad premium o mercado importado.     Alta
+   Premium Gap Tortillas & Wraps  Guyana presenta precio/kg 69.2% superior a RD. Posible oportunidad premium o mercado importado.     Alta
 Low Assortment          Crackers                                   Guyana tiene baja profundidad de surtido en Crackers (8 SKUs).    Media
 3B. Same SKU Cross Country
-No se encontraron SKUs con barcode compartido entre países.
+                           family_key  countries  retailers  sku_records           brand                              product_name  min_price_usd  max_price_usd  avg_price_usd  min_price_kg  max_price_kg  avg_price_kg  price_gap_usd  price_gap_pct
+              pringles_cheddar_cheese          2          2            3        Pringles                   Pringles Cheddar Cheese       1.442308       8.039106       3.940732     13.832749     33.027491     23.430120       6.596798     457.378026
+            pringles_sour_cream_onion          2          2            3        Pringles       Pringles Sour Cream And Onion 5.5oz       1.670391       5.575419       3.761424     20.497864     25.900483     22.890076       3.905028     233.779264
+pepperidge farm_milano_milk_chocolate          2          2            2 Pepperidge Farm Pepperidge Farm Milano Milk Chocolate 6oz       2.955307       6.490385       4.722846     16.887470     38.156961     27.522216       3.535077     119.617929
+                       pringles_pizza          2          2            3        Pringles                            PRINGLES PIZZA       2.355769       4.038462       3.172379     20.028604     20.028604     20.028604       1.682692      71.428571
 

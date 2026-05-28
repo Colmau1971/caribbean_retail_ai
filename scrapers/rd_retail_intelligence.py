@@ -30,7 +30,8 @@ CATEGORIAS = {
         "url": "https://supermercadosrd.com/grupos/galletas",
         "keywords": [
             "galleta", "galletas", "wafer", "waffer",
-            "oreo", "club social", "saltina", "chokis"
+            "oreo", "club social", "saltina", "chokis",
+            "galletas de leche", "festival"
         ]
     },
 
@@ -46,9 +47,12 @@ CATEGORIAS = {
     "Panaderia": {
         "url": "https://supermercadosrd.com/explorar?q=panaderia",
         "keywords": [
-            "pan", "bagel", "brioche",
+            "bagel", "brioche",
             "naan", "pita", "flatbread",
-            "croissant", "tostada",
+            "croissant", "tostada","bread",
+            "brioche", "naan","pan integral",
+            "pan blanco","pan","pan viga","pan sandwich",
+            "pan de hot dog","pan de hamburguesa", "pan de Macadamia"
         ]
     },
 
@@ -201,6 +205,8 @@ def abrir_url(driver, url, espera=3, reintentos=2):
 
     return driver
 
+
+
 # =====================================================
 # FUNCIONES
 # =====================================================
@@ -289,7 +295,7 @@ def detectar_marca(nombre):
         ):
             return marca
 
-    return "N/A"
+    return "Other"
 
 
 def es_categoria(nombre, keywords):
@@ -440,6 +446,22 @@ def retailer_desde_href(href):
 
     return "N/A"
 
+def es_exclusion(nombre):
+
+    n = nombre.lower()
+
+    exclusiones = [
+        "cafe",
+        "café",
+        "molido",
+        "bebida",
+        "jugo",
+        "arroz",
+        "aceite",
+        "detergente",
+    ]
+
+    return any(x in n for x in exclusiones)
 
 def clasificar(nombre, categoria):
 
@@ -534,30 +556,16 @@ for categoria, config in CATEGORIAS.items():
     print("\n===================================")
     print("CATEGORIA:", categoria)
     print("===================================")
+    driver = abrir_url(
+        driver,
+        config["url"],
+        espera=3
+    )
 
-    driver = abrir_url(driver, config["url"], espera=3)
-
-    try:
-
-        links = driver.find_elements(
-            By.XPATH,
-            "//a[contains(@href,'/productos/')]"
-        )
-
-    except (InvalidSessionIdException, WebDriverException):
-
-        driver = reiniciar_driver(driver)
-
-        driver = abrir_url(
-            driver,
-            config["url"],
-            espera=3
-        )
-
-        links = driver.find_elements(
-            By.XPATH,
-            "//a[contains(@href,'/productos/')]"
-        )
+    links = driver.find_elements(
+        By.XPATH,
+        "//a[contains(@href,'/productos/')]"
+    )
 
     productos_links = set()
 
@@ -619,7 +627,16 @@ for categoria, config in CATEGORIAS.items():
                 extract_barcode(html)
             )
 
-            nombre = nombre_desde_url(link)
+            try:
+            
+                nombre = driver.find_element(
+                    By.TAG_NAME,
+                    "h1"
+                ).text.strip()
+            
+            except Exception:
+            
+                nombre = nombre_desde_url(link)
 
             pres = presentacion(nombre)
 
@@ -637,10 +654,7 @@ for categoria, config in CATEGORIAS.items():
                     pres = p
                     break
 
-            if not es_categoria(
-                nombre,
-                config["keywords"]
-            ):
+            if not es_categoria(nombre, config["keywords"]) or es_exclusion(nombre):
 
                 print("NO ES CATEGORIA:", nombre)
 
@@ -745,6 +759,7 @@ for categoria, config in CATEGORIAS.items():
 
                         # Core fields
                         "category": categoria,
+                        "source_category": categoria,
                         "retailer": retailer,
                         "brand": marca,
                         "product_name": nombre,

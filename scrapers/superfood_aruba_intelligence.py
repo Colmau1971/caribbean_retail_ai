@@ -78,6 +78,10 @@ def start_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-extensions")
+    options.add_argument("--disable-features=VizDisplayCompositor")
+    options.add_argument("--remote-debugging-port=9222")
+    options.add_argument("--disable-background-timer-throttling")
+    options.add_argument("--disable-backgrounding-occluded-windows")
 
     driver = uc.Chrome(
         options=options,
@@ -86,7 +90,6 @@ def start_driver():
     )
 
     return driver
-
 
 def build_search_url(term):
 
@@ -761,145 +764,77 @@ def main():
 
     all_products = []
 
-    for category, terms in SEARCH_TERMS.items():
+    driver = None
 
-        for term in terms:
+    try:
+        driver = start_driver()
 
-            driver = None
+        if driver is None:
+            print("Chrome no pudo iniciar.")
+            return
 
-            try:
+        for category, terms in SEARCH_TERMS.items():
 
-                driver = start_driver()
-
-                products = scrape_search(
-                    driver,
-                    category,
-                    term,
-                )
-
-                all_products.extend(
-                    products
-                )
-
-            except Exception as e:
-
-                print(
-                    f"SCRAPER ERROR: {e}"
-                )
-
-            finally:
+            for term in terms:
 
                 try:
+                    products = scrape_search(
+                        driver,
+                        category,
+                        term,
+                    )
 
-                    if driver:
+                    all_products.extend(products)
+
+                except Exception as e:
+                    print(f"ERROR EN {category} | {term}: {e}")
+
+                    try:
                         driver.quit()
+                    except Exception:
+                        pass
 
-                except Exception:
-                    pass
+                    print("Reiniciando Chrome...")
+                    driver = start_driver()
 
-            time.sleep(3)
+                time.sleep(5)
+
+    finally:
+        try:
+            if driver:
+                driver.quit()
+        except Exception:
+            pass
 
     df = pd.DataFrame(all_products)
 
     if df.empty:
-
-        print(
-            "No se encontraron productos."
-        )
-
+        print("No se encontraron productos.")
         return
+    df = df.drop_duplicates()
 
-    if "barcode" in df.columns:
-
-        df["barcode"] = (
-            df["barcode"]
-            .apply(normalize_barcode)
-        )
-
-        df["barcode_length"] = (
-            df["barcode"]
-            .astype("string")
-            .str.len()
-        )
-
-    df = df.loc[
-        :,
-        ~df.columns.duplicated()
-    ]
-
-    subset_cols = [
-        c for c in [
-            "product_name",
-            "price_local",
-            "barcode",
-            "source_category",
-        ]
-        if c in df.columns
-    ]
-
-    df = df.drop_duplicates(
-        subset=subset_cols
-    )
-
-    excel_path = (
+    output_file = (
         OUTPUT_DIR /
-        f"superfood_aruba_retail_intelligence_"
-        f"{TIMESTAMP}.xlsx"
-    )
-
-    csv_path = (
-        OUTPUT_DIR /
-        f"superfood_aruba_retail_intelligence_"
-        f"{TIMESTAMP}.csv"
-    )
-
-    df.to_excel(
-        excel_path,
-        index=False
+        f"superfood_aruba_retail_intelligence_{TIMESTAMP}.csv"
     )
 
     df.to_csv(
-        csv_path,
+        output_file,
         index=False,
-        encoding="utf-8-sig",
+        encoding="utf-8-sig"
     )
 
-    lm_csv, lm_txt, lm_jsonl = (
-        export_lmstudio(df)
-    )
+    lm_csv, lm_txt, lm_jsonl = export_lmstudio(df)
 
-    print("\n====================================")
-    print(" SUPER FOOD ARUBA INTELLIGENCE")
-    print("====================================")
+    print("\n===================================")
+    print(" SUPER FOOD ARUBA FINISHED")
+    print("===================================")
 
-    print(
-        f"Productos normalizados: "
-        f"{len(df)}"
-    )
-
-    if "barcode" in df.columns:
-
-        print(
-            "Barcodes encontrados:",
-            df["barcode"].notna().sum()
-        )
-
-        print(
-            "\nDistribución barcode_length:"
-        )
-
-        print(
-            df["barcode_length"]
-            .value_counts(dropna=False)
-        )
-
-    print(f"Excel: {excel_path}")
-    print(f"CSV: {csv_path}")
-
-    print(f"CSV LM Studio: {lm_csv}")
-    print(f"TXT RAG: {lm_txt}")
-    print(f"JSONL RAG: {lm_jsonl}")
-
+    print(f"Productos totales: {len(df)}")
+    print(f"CSV: {output_file}")
+    print(f"LM CSV: {lm_csv}")
+    print(f"LM TXT: {lm_txt}")
+    print(f"LM JSONL: {lm_jsonl}")
 
 if __name__ == "__main__":
     main()
