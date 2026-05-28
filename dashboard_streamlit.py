@@ -113,17 +113,35 @@ if brands:
 # KPIs
 # ==============================
 
-total_skus = len(filtered)
+total_records = len(filtered)
+
+if "family_key" in filtered.columns:
+    unique_skus = filtered["family_key"].nunique()
+elif "match_key" in filtered.columns:
+    unique_skus = filtered["match_key"].nunique()
+elif "barcode_harmonized" in filtered.columns:
+    unique_skus = filtered["barcode_harmonized"].nunique()
+elif "barcode" in filtered.columns:
+    unique_skus = filtered["barcode"].nunique()
+else:
+    unique_skus = filtered["product_name"].nunique()
+
 total_countries = filtered["country"].nunique()
 total_categories = filtered["standard_category"].nunique()
-avg_price_kg = filtered["price_per_kg_usd"].mean() if "price_per_kg_usd" in filtered.columns else None
 
-kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+avg_price_kg = (
+    filtered["price_per_kg_usd"].median()
+    if "price_per_kg_usd" in filtered.columns
+    else None
+)
 
-kpi1.metric("Total SKUs", f"{total_skus:,.0f}")
-kpi2.metric("Países", f"{total_countries}")
-kpi3.metric("Categorías", f"{total_categories}")
-kpi4.metric("Precio prom. USD/kg", f"${avg_price_kg:,.2f}" if pd.notna(avg_price_kg) else "N/A")
+kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
+
+kpi1.metric("Total Records", f"{total_records:,.0f}")
+kpi2.metric("Unique SKUs", f"{unique_skus:,.0f}")
+kpi3.metric("Países", f"{total_countries}")
+kpi4.metric("Categorías", f"{total_categories}")
+kpi5.metric("Precio prom. USD/kg", f"${avg_price_kg:,.2f}" if pd.notna(avg_price_kg) else "N/A")
 
 st.divider()
 
