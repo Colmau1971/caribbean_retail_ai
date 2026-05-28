@@ -24,49 +24,44 @@ EXCHANGE_RATE_DOP_USD = 63.11
 # CATEGORIAS
 # =====================================================
 
-CATEGORIAS = {
+SEARCH_TERMS = {
 
-    "Galletas": {
-        "url": "https://supermercadosrd.com/grupos/galletas",
-        "keywords": [
-            "galleta", "galletas", "wafer", "waffer",
-            "oreo", "club social", "saltina", "chokis",
-            "galletas de leche", "festival"
-        ]
-    },
+    "Galletas": [
+        "galletas",
+        "galleta",
+        "oreo",
+        "wafer",
+        "club social",
+        "festival",
+    ],
 
-    "Tortillas": {
-        "url": "https://supermercadosrd.com/grupos/tortillas",
-        "keywords": [
-            "tortilla", "wrap", "burrito",
-            "taco", "tostada", "naan",
-            "pita", "flatbread"
-        ]
-    },
+    "Tortillas": [
+        "tortilla",
+        "wrap",
+        "burrito",
+        "pita",
+    ],
 
-    "Panaderia": {
-        "url": "https://supermercadosrd.com/explorar?q=panaderia",
-        "keywords": [
-            "bagel", "brioche",
-            "naan", "pita", "flatbread",
-            "croissant", "tostada","bread",
-            "brioche", "naan","pan integral",
-            "pan blanco","pan","pan viga","pan sandwich",
-            "pan de hot dog","pan de hamburguesa", "pan de Macadamia"
-        ]
-    },
+    "Panaderia": [
+        "pan viga",
+        "pan integral",
+        "pan sandwich",
+        "pan de hamburguesa",
+        "pan de hot dog",
+        "croissant",
+        "bagel",
+        "brioche",
+        "flatbread",
+    ],
 
-    "Pasteleria": {
-        "url": "https://supermercadosrd.com/explorar?q=bizcocho",
-        "keywords": [
-            "cake", "pastel", "ponque",
-            "ponqué", "bizcocho",
-            "muffin", "brownie",
-            "cupcake"
-        ]
-    }
+    "Pasteleria": [
+        "bizcocho",
+        "cake",
+        "brownie",
+        "muffin",
+        "cupcake",
+    ]
 }
-
 # =====================================================
 # MARCAS
 # =====================================================
@@ -79,7 +74,8 @@ MARCAS = [
     "Club Social", "Colombina", "Princesa",
     "Gullon", "Wala", "Bocel", "Líder",
     "Choco Wow", "Nabisco", "Ritz",
-    "Members Selection",
+    "Members Selection","Galleta Sandwich",
+    "Galleta De Soda",
 
     # Tortillas / wraps
     "Maria", "María", "La Real",
@@ -190,6 +186,7 @@ def reiniciar_driver(driver):
 
 
 def abrir_url(driver, url, espera=3, reintentos=2):
+    
 
     for intento in range(1, reintentos + 1):
 
@@ -205,6 +202,51 @@ def abrir_url(driver, url, espera=3, reintentos=2):
 
     return driver
 
+
+# =====================================================
+# BUILD SEARCH URL
+# =====================================================
+def click_load_more(driver, max_clicks=10):
+
+    for i in range(max_clicks):
+
+        try:
+            buttons = driver.find_elements(
+                By.XPATH,
+                "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚ', 'abcdefghijklmnopqrstuvwxyzáéíóú'), 'load more') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚ', 'abcdefghijklmnopqrstuvwxyzáéíóú'), 'mostrar más') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚ', 'abcdefghijklmnopqrstuvwxyzáéíóú'), 'mostrar mas') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚ', 'abcdefghijklmnopqrstuvwxyzáéíóú'), 'ver más') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚ', 'abcdefghijklmnopqrstuvwxyzáéíóú'), 'ver mas')]"
+            )
+
+            if not buttons:
+                break
+
+            button = buttons[-1]
+
+            driver.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});",
+                button
+            )
+
+            time.sleep(1)
+
+            driver.execute_script(
+                "arguments[0].click();",
+                button
+            )
+
+            time.sleep(3)
+
+            print(f"Load more click: {i + 1}")
+
+        except Exception as e:
+            print(f"No more load more: {e}")
+            break
+        
+def build_search_url(term):
+
+    return (
+        "https://supermercadosrd.com/explorar?q="
+        + term.replace(" ", "+")
+    )
 
 
 # =====================================================
@@ -550,268 +592,290 @@ driver = crear_driver(headless=True)
 # =====================================================
 
 productos = []
+seen_urls = set()
 
-for categoria, config in CATEGORIAS.items():
+for categoria, terms in SEARCH_TERMS.items():
 
     print("\n===================================")
     print("CATEGORIA:", categoria)
     print("===================================")
-    driver = abrir_url(
-        driver,
-        config["url"],
-        espera=3
-    )
 
-    links = driver.find_elements(
-        By.XPATH,
-        "//a[contains(@href,'/productos/')]"
-    )
+    for term in terms:
 
-    productos_links = set()
+        url = build_search_url(term)
 
-    for link in links:
+        print(
+            f"\nBUSQUEDA: "
+            f"{categoria} | {term}"
+        )
 
-        href = link.get_attribute("href")
+        driver = abrir_url(
+            driver,
+            url,
+            espera=3
+        )
+        click_load_more(driver)
+        driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);"
+        )
+        
+        time.sleep(2)
 
-        if href and "/productos/" in href:
-            productos_links.add(href)
+        links = driver.find_elements(
+            By.XPATH,
+            "//a[contains(@href,'/productos/')]"
+        )   
+    
 
-    productos_links = sorted(productos_links)
+        productos_links = set()
+    
+        for link in links:
+    
+            href = link.get_attribute("href")
+    
+            if href and "/productos/" in href:
+                productos_links.add(href)
+    
+        productos_links = sorted(productos_links)
+    
+        print("Productos encontrados:", len(productos_links))
 
-    print("Productos encontrados:", len(productos_links))
-
-    # =================================================
-
-    for idx, link in enumerate(productos_links):
-
-        try:
-
-            print(f"\n[{idx + 1}/{len(productos_links)}] {link}")
-
-            driver = abrir_url(
-                driver,
-                link,
-                espera=2
-            )
-
+        # =================================================
+    
+        for idx, link in enumerate(productos_links):
+            if link in seen_urls:
+                continue
+            
+            seen_urls.add(link)
+                
             try:
-
-                html = driver.page_source
-
-                texto = driver.find_element(
-                    By.TAG_NAME,
-                    "body"
-                ).text
-
-            except (
-                InvalidSessionIdException,
-                WebDriverException
-            ):
-
-                driver = reiniciar_driver(driver)
-
+    
+                print(f"\n[{idx + 1}/{len(productos_links)}] {link}")
+    
                 driver = abrir_url(
                     driver,
                     link,
                     espera=2
                 )
-
-                html = driver.page_source
-
-                texto = driver.find_element(
-                    By.TAG_NAME,
-                    "body"
-                ).text
-
-            barcode = normalize_barcode(
-                extract_barcode(html)
-            )
-
-            try:
-            
-                nombre = driver.find_element(
-                    By.TAG_NAME,
-                    "h1"
-                ).text.strip()
-            
-            except Exception:
-            
-                nombre = nombre_desde_url(link)
-
-            pres = presentacion(nombre)
-
-            lineas = [
-                x.strip()
-                for x in texto.splitlines()
-                if x.strip()
-            ]
-
-            for linea in lineas:
-
-                p = presentacion(linea)
-
-                if p != "-":
-                    pres = p
-                    break
-
-            if not es_categoria(nombre, config["keywords"]) or es_exclusion(nombre):
-
-                print("NO ES CATEGORIA:", nombre)
-
-                continue
-
-            marca = detectar_marca(nombre)
-
-            tipo = clasificar(
-                nombre,
-                categoria
-            )
-
-            weight_kg = extract_weight_kg(pres)
-
-            print("PRODUCTO:", nombre)
-            print("PRESENTACIÓN:", pres)
-
-            if barcode:
-                print("BARCODE:", barcode)
-
-            botones = driver.find_elements(
-                By.XPATH,
-                "//*[contains(text(), 'Buscar')]"
-            )
-
-            if not botones:
-
-                print("SIN BOTONES")
-
-                continue
-
-            for boton in botones:
-
+    
                 try:
-
-                    href_retailer = boton.get_attribute("href")
-
-                    retailer = retailer_desde_href(
-                        href_retailer
+    
+                    html = driver.page_source
+    
+                    texto = driver.find_element(
+                        By.TAG_NAME,
+                        "body"
+                    ).text
+    
+                except (
+                    InvalidSessionIdException,
+                    WebDriverException
+                ):
+    
+                    driver = reiniciar_driver(driver)
+    
+                    driver = abrir_url(
+                        driver,
+                        link,
+                        espera=2
                     )
-
+    
+                    html = driver.page_source
+    
+                    texto = driver.find_element(
+                        By.TAG_NAME,
+                        "body"
+                    ).text
+    
+                barcode = normalize_barcode(
+                    extract_barcode(html)
+                )
+    
+                try:
+                
+                    nombre = driver.find_element(
+                        By.TAG_NAME,
+                        "h1"
+                    ).text.strip()
+                
+                except Exception:
+                
+                    nombre = nombre_desde_url(link)
+    
+                pres = presentacion(nombre)
+    
+                lineas = [
+                    x.strip()
+                    for x in texto.splitlines()
+                    if x.strip()
+                ]
+    
+                for linea in lineas:
+    
+                    p = presentacion(linea)
+    
+                    if p != "-":
+                        pres = p
+                        break
+    
+                if not es_categoria(nombre, terms) or es_exclusion(nombre):
+    
+                    print("NO ES CATEGORIA:", nombre)
+    
+                    continue
+    
+                marca = detectar_marca(nombre)
+    
+                tipo = clasificar(
+                    nombre,
+                    categoria
+                )
+    
+                weight_kg = extract_weight_kg(pres)
+    
+                print("PRODUCTO:", nombre)
+                print("PRESENTACIÓN:", pres)
+    
+                if barcode:
+                    print("BARCODE:", barcode)
+    
+                botones = driver.find_elements(
+                    By.XPATH,
+                    "//*[contains(text(), 'Buscar')]"
+                )
+    
+                if not botones:
+    
+                    print("SIN BOTONES")
+    
+                    continue
+    
+                for boton in botones:
+    
                     try:
-
-                        card = boton.find_element(
-                            By.XPATH,
-                            "./ancestor::div[contains(@class,'grid')][1]"
+    
+                        href_retailer = boton.get_attribute("href")
+    
+                        retailer = retailer_desde_href(
+                            href_retailer
                         )
-
-                    except NoSuchElementException:
-
-                        card = boton.find_element(
-                            By.XPATH,
-                            "./ancestor::div[1]"
+    
+                        try:
+    
+                            card = boton.find_element(
+                                By.XPATH,
+                                "./ancestor::div[contains(@class,'grid')][1]"
+                            )
+    
+                        except NoSuchElementException:
+    
+                            card = boton.find_element(
+                                By.XPATH,
+                                "./ancestor::div[1]"
+                            )
+    
+                        card_text = card.text
+    
+                        precios = re.findall(
+                            r"RD\$ ?([\d,.]+)",
+                            card_text
                         )
-
-                    card_text = card.text
-
-                    precios = re.findall(
-                        r"RD\$ ?([\d,.]+)",
-                        card_text
-                    )
-
-                    if not precios:
-                        continue
-
-                    precio_rd = float(
-                        precios[0].replace(",", "")
-                    )
-
-                    precio_100g_rd = precio_100g(
-                        precio_rd,
-                        pres
-                    )
-
-                    # =================================================
-                    # CONVERSIONES USD
-                    # =================================================
-
-                    precio_usd = round(
-                        precio_rd / EXCHANGE_RATE_DOP_USD,
-                        2
-                    )
-
-                    precio_kg_usd = None
-
-                    if precio_100g_rd is not None:
-
-                        precio_kg_rd = (
-                            precio_100g_rd * 10
+    
+                        if not precios:
+                            continue
+    
+                        precio_rd = float(
+                            precios[0].replace(",", "")
                         )
-
-                        precio_kg_usd = round(
-                            precio_kg_rd / EXCHANGE_RATE_DOP_USD,
+    
+                        precio_100g_rd = precio_100g(
+                            precio_rd,
+                            pres
+                        )
+    
+                        # =================================================
+                        # CONVERSIONES USD
+                        # =================================================
+    
+                        precio_usd = round(
+                            precio_rd / EXCHANGE_RATE_DOP_USD,
                             2
                         )
-
-                    productos.append({
-
-                        # Regional standard
-                        "country": "Dominican Republic",
-                        "currency": "DOP",
-
-                        # Core fields
-                        "category": categoria,
-                        "source_category": categoria,
-                        "retailer": retailer,
-                        "brand": marca,
-                        "product_name": nombre,
-
-                        # SKU Identity
-                        "barcode": barcode,
-                        "barcode_length": (
-                            len(barcode)
-                            if barcode
-                            else None
-                        ),
-
-                        # Pricing
-                        "price_local": precio_rd,
-                        "price_usd": precio_usd,
-
-                        # Weight
-                        "presentation": pres,
-                        "weight_kg": weight_kg,
-
-                        # Price architecture
-                        "price_per_100g_local": precio_100g_rd,
-                        "price_per_kg_usd": precio_kg_usd,
-
-                        # Strategic fields
-                        "segment": segmento(
-                            precio_100g_rd
-                        ),
-
-                        "type": tipo,
-
-                        # URLs
-                        "product_url": link,
-                        "retailer_url": href_retailer
-                    })
-
-                    print(
-                        "OK:",
-                        retailer,
-                        "| RD$",
-                        precio_rd,
-                        "| USD",
-                        precio_usd
-                    )
-
-                except Exception as e:
-
-                    print("ERROR CARD:", e)
-
-        except Exception as e:
-
-            print("ERROR PRODUCTO:", e)
+    
+                        precio_kg_usd = None
+    
+                        if precio_100g_rd is not None:
+    
+                            precio_kg_rd = (
+                                precio_100g_rd * 10
+                            )
+    
+                            precio_kg_usd = round(
+                                precio_kg_rd / EXCHANGE_RATE_DOP_USD,
+                                2
+                            )
+    
+                        productos.append({
+                            "search_term": term,
+                            # Regional standard
+                            "country": "Dominican Republic",
+                            "currency": "DOP",
+    
+                            # Core fields
+                            "category": categoria,
+                            "source_category": categoria,
+                            "retailer": retailer,
+                            "brand": marca,
+                            "product_name": nombre,
+    
+                            # SKU Identity
+                            "barcode": barcode,
+                            "barcode_length": (
+                                len(barcode)
+                                if barcode
+                                else None
+                            ),
+    
+                            # Pricing
+                            "price_local": precio_rd,
+                            "price_usd": precio_usd,
+    
+                            # Weight
+                            "presentation": pres,
+                            "weight_kg": weight_kg,
+    
+                            # Price architecture
+                            "price_per_100g_local": precio_100g_rd,
+                            "price_per_kg_usd": precio_kg_usd,
+    
+                            # Strategic fields
+                            "segment": segmento(
+                                precio_100g_rd
+                            ),
+    
+                            "type": tipo,
+    
+                            # URLs
+                            "product_url": link,
+                            "retailer_url": href_retailer
+                        })
+    
+                        print(
+                            "OK:",
+                            retailer,
+                            "| RD$",
+                            precio_rd,
+                            "| USD",
+                            precio_usd
+                        )
+    
+                    except Exception as e:
+    
+                        print("ERROR CARD:", e)
+    
+            except Exception as e:
+    
+                print("ERROR PRODUCTO:", e)
 
 # =====================================================
 # CLOSE DRIVER

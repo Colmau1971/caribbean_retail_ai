@@ -355,11 +355,10 @@ def clean_product_name(text):
     if not text:
         return None
 
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    ).strip()
+    text = BeautifulSoup(
+        text,
+        "lxml"
+    ).get_text(" ", strip=True)
 
     cleanup = [
         "Remove from List",
@@ -371,12 +370,42 @@ def clean_product_name(text):
     for c in cleanup:
         text = text.replace(c, "")
 
-    text = text.strip()
+    text = re.sub(r"\s+", " ", text).strip()
 
-    if len(text) > 180:
-        text = text[:180]
+    # EXTRAER PESO
+    weight_match = re.search(
+        r"([0-9]+(?:\.[0-9]+)?\s?(?:oz|kg|g|gr|lb|lbs))",
+        text,
+        re.IGNORECASE
+    )
 
-    return text
+    weight = (
+        weight_match.group(1)
+        if weight_match
+        else ""
+    )
+
+    # ELIMINAR PESO DEL NOMBRE
+    core = re.sub(
+        r"([0-9]+(?:\.[0-9]+)?\s?(?:oz|kg|g|gr|lb|lbs))",
+        "",
+        text,
+        flags=re.IGNORECASE
+    ).strip()
+
+    # BRAND
+    brand = infer_brand(core)
+
+    # LIMPIEZA FINAL
+    core = core.replace("|", " ")
+
+    # FORMATO ESTRUCTURADO
+    final = f"{brand} | {core}"
+
+    if weight:
+        final += f" | {weight}"
+
+    return final.strip()
 
 
 def scroll_page(driver):
