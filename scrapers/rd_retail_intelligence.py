@@ -90,7 +90,8 @@ MARCAS = [
     "Natures Own", "Bauducco",
     "Bauduco", "Bimbo", "Sara Lee",
     "Pepperidge Farm", "Arnold",
-    "Wonder", "Martin's",
+    "Wonder", "Martin's","Dulcesol",
+    "Buenhorno","Atlanta",
 
     # Pastelería
     "Entenmann's", "Hostess",

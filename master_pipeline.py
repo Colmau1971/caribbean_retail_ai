@@ -858,6 +858,80 @@ def build_regional_dataset():
         print(f"Brand correction error: {e}")
 
     # ==========================================
+    # BRAND NORMALIZATION ENGINE
+    # Missing brands backlog
+    # ==========================================
+
+    try:
+
+        missing_brands = regional_df[
+            regional_df["brand"]
+            .astype(str)
+            .str.strip()
+            .str.lower()
+            .isin(["other", "unknown", "nan", "none"])
+        ].copy()
+
+        if not missing_brands.empty:
+
+            missing_brands["possible_brand"] = (
+                missing_brands["product_name"]
+                .astype(str)
+                .str.replace("-", " ", regex=False)
+                .str.split()
+                .str[0]
+                .str.title()
+            )
+
+            missing_summary = (
+                missing_brands
+                .groupby(
+                    [
+                        "possible_brand",
+                        "country",
+                        "source_category",
+                        "search_term",
+                    ],
+                    dropna=False
+                )
+                .agg(
+                    records=("product_name", "count"),
+                    sample_product=("product_name", "first"),
+                )
+                .reset_index()
+                .sort_values(
+                    "records",
+                    ascending=False
+                )
+            )
+
+            missing_file = (
+                REGIONAL_OUTPUT /
+                f"missing_brand_backlog_{TIMESTAMP}.csv"
+            )
+
+            missing_summary.to_csv(
+                missing_file,
+                index=False,
+                encoding="utf-8-sig"
+            )
+
+            print("\n===================================")
+            print(" BRAND NORMALIZATION ENGINE")
+            print("===================================")
+            print("Missing brand candidates:")
+            print(missing_summary.head(50))
+            print(f"Backlog file: {missing_file}")
+
+        else:
+
+            print("No missing brands found.")
+
+    except Exception as e:
+
+        print(f"Brand normalization engine error: {e}")
+        
+    # ==========================================
     # REMOVE "OTHER" BRANDS
     # ==========================================
 
