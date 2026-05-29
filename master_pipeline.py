@@ -882,6 +882,35 @@ def build_regional_dataset():
                 .str[0]
                 .str.title()
             )
+            
+            GENERIC_BRANDS = {
+                "Other",
+                "Pan",
+                "Bread",
+                "Bakery",
+                "Frozen",
+                "Galleta",
+                "Galletas",
+                "Cookie",
+                "Cookies",
+                "Cracker",
+                "Crackers",
+                "Wafer",
+                "Bizcocho",
+                "Cake",
+                "Cupcake",
+                "Brownie",
+                "Muffin",
+                "Pita",
+                "Wrap",
+                "Wraps",
+                "Tortilla",
+                "Tortillas",
+                "Chips",
+                "Snack",
+                "Snacks",
+                "Mezcla",
+            }
 
             missing_summary = (
                 missing_brands
@@ -904,6 +933,11 @@ def build_regional_dataset():
                     ascending=False
                 )
             )
+
+            missing_summary = missing_summary[
+                ~missing_summary["possible_brand"]
+                .isin(GENERIC_BRANDS)
+            ]
 
             missing_file = (
                 REGIONAL_OUTPUT /

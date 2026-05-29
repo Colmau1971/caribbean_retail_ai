@@ -136,7 +136,30 @@ def infer_brand(name):
         "quaker": "Quaker",
         "nabisco": "Nabisco",
         "bauducco": "Bauducco",
-    }
+        
+        # Bakery
+        "food for life": "Food For Life",
+        "ezekiel": "Food For Life",
+        "dave's killer": "Dave's Killer Bread",
+        "oroweat": "Oroweat",
+        "brownberry": "Brownberry",
+        
+        # Cookies
+        "wibisco": "Wibisco",
+        "bermudez": "Bermudez",
+        "colombina": "Colombina",
+        "noel": "Noel",
+        "devon": "Devon",
+        
+        # Snacks
+        "ruffles": "Ruffles",
+        "cheez it": "Cheez-It",
+        "keebler": "Keebler",
+        "planters": "Planters",
+        
+        # Frozen
+        "eggo": "Eggo",
+        }
 
     for keyword, brand in BRAND_KEYWORDS.items():
 
