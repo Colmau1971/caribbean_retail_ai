@@ -328,7 +328,23 @@ def infer_brand(name):
         "stouffer's":"STOUFFER'S",
         "digiorno":"DIGIORNO",
         "kinnikinnick":"Kinnikinnick",
-        "becky's":"BECKY'S"
+        "becky's":"BECKY'S",
+
+        # NEW BRANDS
+
+        "colombina": "Colombina",
+        "planters": "Planters",
+        "snickers": "Snickers",
+        "ovaltine": "Ovaltine",
+        "mcvities": "McVitie's",
+        "walkers": "Walkers",
+        "glad": "Glad",
+        "reynolds": "Reynolds",
+        "toppers": "Toppers",
+        "soldanza": "Soldanza",
+        "motto": "Motto",
+        "phidelia": "Phidelia",
+        "whytes": "Whytes"
     }
     
     for keyword, brand in BRAND_KEYWORDS.items():

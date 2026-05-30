@@ -130,7 +130,23 @@ MARCAS = [
     # Healthy
     "Simple Mills",
     "Mary's Gone Crackers",
-]
+
+    # NEW BRANDS
+
+    "Colombina",
+    "Planters",
+    "Snickers",
+    "Ovaltine",
+    "Mcvities",
+    "Walkers",
+    "Glad",
+    "Reynolds",
+    "Toppers",
+    "Soldanza",
+    "Motto",
+    "Phidelia",
+    "Whytes",
+    ]
 
 # =====================================================
 # OUTPUT

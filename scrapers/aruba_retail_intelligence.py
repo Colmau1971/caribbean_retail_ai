@@ -159,6 +159,22 @@ def infer_brand(name):
         
         # Frozen
         "eggo": "Eggo",
+
+        # NEW BRANDS
+
+        "colombina": "Colombina",
+        "planters": "Planters",
+        "snickers": "Snickers",
+        "ovaltine": "Ovaltine",
+        "mcvities": "McVitie's",
+        "walkers": "Walkers",
+        "glad": "Glad",
+        "reynolds": "Reynolds",
+        "toppers": "Toppers",
+        "soldanza": "Soldanza",
+        "motto": "Motto",
+        "phidelia": "Phidelia",
+        "whytes": "Whytes",
         }
 
     for keyword, brand in BRAND_KEYWORDS.items():

@@ -54,7 +54,32 @@ def load_data():
 
     return df
 
-df = load_data()
+df = load_data()    
+
+# ==============================
+# BRAND / CATEGORY INTELLIGENCE
+# ==============================
+
+brand_file = Path(
+    "outputs/regional/brand_country_price_kg.xlsx"
+)
+
+category_file = Path(
+    "outputs/regional/category_country_price_kg.xlsx"
+)
+
+brand_intelligence_df = pd.DataFrame()
+category_intelligence_df = pd.DataFrame()
+
+if brand_file.exists():
+    brand_intelligence_df = pd.read_excel(
+        brand_file
+    )
+
+if category_file.exists():
+    category_intelligence_df = pd.read_excel(
+        category_file
+    )
 # ==============================
 # COLUMN NORMALIZATION
 # ==============================
@@ -259,6 +284,178 @@ if not opportunity.empty:
     )
 else:
     st.info("No hay datos suficientes para calcular Opportunity Score.")
+
+# ==============================
+# BRAND INTELLIGENCE
+# ==============================
+
+st.subheader("🏷️ Brand Intelligence")
+
+if not brand_intelligence_df.empty:
+
+    top_brand_price = (
+        brand_intelligence_df
+        .sort_values(
+            "avg_price_kg_usd",
+            ascending=False
+        )
+        .head(25)
+    )
+
+    fig = px.bar(
+        top_brand_price,
+        x="brand",
+        y="avg_price_kg_usd",
+        color="country",
+        title="Top Brand Pricing (USD/kg)"
+    )
+
+    st.plotly_chart(
+        fig,
+        width="stretch"
+    )
+
+    st.dataframe(
+        brand_intelligence_df.sort_values(
+            "avg_price_kg_usd",
+            ascending=False
+        ),
+        width="stretch"
+    )
+    st.subheader("🌎 Brand Regional Presence")
+
+    brand_presence = (
+        brand_intelligence_df
+        .groupby("brand", as_index=False)
+        .agg(
+            countries=("country", "nunique"),
+            total_skus=("skus", "sum"),
+            avg_price_kg_usd=("avg_price_kg_usd", "mean")
+        )
+        .sort_values(
+            ["countries", "total_skus"],
+            ascending=False
+        )
+    )
+
+    fig = px.scatter(
+        brand_presence.head(40),
+        x="total_skus",
+        y="avg_price_kg_usd",
+        size="countries",
+        color="countries",
+        hover_data=["brand"],
+        title="Brand Presence vs Price Position"
+    )
+
+    st.plotly_chart(
+        fig,
+        width="stretch"
+    )
+
+    st.dataframe(
+        brand_presence,
+        width="stretch"
+    )
+else:
+
+    st.info(
+        "No existe brand_country_price_kg.xlsx"
+    )
+    
+# ==============================
+# CATEGORY INTELLIGENCE
+# ==============================
+
+st.subheader("📊 Category Intelligence")
+
+if not category_intelligence_df.empty:
+
+    fig = px.bar(
+        category_intelligence_df,
+        x="standard_category",
+        y="avg_price_kg_usd",
+        color="country",
+        barmode="group",
+        title="Category Price Architecture"
+    )
+
+    st.plotly_chart(
+        fig,
+        width="stretch"
+    )
+
+    category_matrix = (
+        category_intelligence_df
+        .pivot_table(
+            index="standard_category",
+            columns="country",
+            values="avg_price_kg_usd"
+        )
+        .round(2)
+    )
+
+    st.subheader(
+        "Regional Category Matrix USD/kg"
+    )
+
+    st.dataframe(
+        category_matrix,
+        width="stretch"
+    )
+    st.subheader("📈 Category Index (RD = 100)")
+
+    index_matrix = category_matrix.copy()
+
+    if "Dominican Republic" in index_matrix.columns:
+
+        rd_base = index_matrix["Dominican Republic"]
+
+        index_matrix = (
+            index_matrix
+            .div(rd_base, axis=0)
+            * 100
+        ).round(0)
+
+        st.dataframe(
+            index_matrix,
+            width="stretch"
+        )
+
+        index_long = (
+            index_matrix
+            .reset_index()
+            .melt(
+                id_vars="standard_category",
+                var_name="country",
+                value_name="index_vs_rd"
+            )
+        )
+
+        fig = px.bar(
+            index_long,
+            x="standard_category",
+            y="index_vs_rd",
+            color="country",
+            barmode="group",
+            title="Category Price Index vs Dominican Republic"
+        )
+
+        st.plotly_chart(
+            fig,
+            width="stretch"
+        )
+
+    else:
+
+        st.info(
+            "No se encontró Dominican Republic para calcular RD = 100."
+        ) 
+else:
+
+    st.info(
+        "No existe category_country_price_kg.xlsx"
+    )        
 # ==============================
 # SAME SKU CROSS COUNTRY
 # ==============================

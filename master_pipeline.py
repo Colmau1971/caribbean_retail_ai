@@ -391,6 +391,21 @@ def harmonize_barcode(barcode):
 
 def build_family_key(row):
 
+    barcode = str(
+        row.get("barcode", "")
+    ).strip()
+
+    if barcode and barcode.lower() != "nan":
+
+        barcode = re.sub(
+            r"[^0-9]",
+            "",
+            barcode
+        )
+
+        if len(barcode) >= 8:
+            return f"BC_{barcode}"
+
     brand = str(
         row.get("brand", "")
     ).upper().strip()
@@ -398,13 +413,6 @@ def build_family_key(row):
     name = str(
         row.get("product_name", "")
     ).upper()
-
-    weight = row.get("weight_kg")
-
-    if pd.notna(weight):
-        weight_g = round(weight * 1000)
-    else:
-        weight_g = ""
 
     name = re.sub(
         r"[^A-Z0-9 ]",
@@ -426,15 +434,33 @@ def build_family_key(row):
         "WRAPS",
         "TORTILLA",
         "TORTILLAS",
+        "THE",
+        "AND",
+        "WITH",
+        "OF",
     }
 
     tokens = [
         t
         for t in name.split()
-        if t not in STOP_WORDS
+        if (
+            len(t) > 2
+            and t not in STOP_WORDS
+        )
     ]
 
-    descriptor = "_".join(tokens[:3])
+    descriptor = "_".join(
+        tokens[:5]
+    )
+
+    weight = row.get("weight_kg")
+
+    if pd.notna(weight):
+        weight_g = round(
+            weight * 1000
+        )
+    else:
+        weight_g = ""
 
     return (
         f"{brand}_{descriptor}_{weight_g}"
@@ -924,7 +950,94 @@ def build_regional_dataset():
     except Exception as e:
 
         print(f"Brand correction error: {e}")
+    except Exception as e:
 
+        print(f"Brand correction error: {e}")
+
+    # ==========================================
+    # BRAND GROUP NORMALIZATION
+    # Parent company / brand family
+    # ==========================================
+
+    def normalize_brand_group(brand):
+
+        if pd.isna(brand):
+            return "Unknown"
+
+        b = str(brand).strip().lower()
+
+        BRAND_GROUPS = {
+            # PEPSICO / FRITO-LAY
+            "lays": "PepsiCo / Frito-Lay",
+            "lay's": "PepsiCo / Frito-Lay",
+            "fritolay": "PepsiCo / Frito-Lay",
+            "frito lay": "PepsiCo / Frito-Lay",
+            "doritos": "PepsiCo / Frito-Lay",
+            "cheetos": "PepsiCo / Frito-Lay",
+            "tostitos": "PepsiCo / Frito-Lay",
+            "ruffles": "PepsiCo / Frito-Lay",
+            "sun chips": "PepsiCo / Frito-Lay",
+
+            # MONDELEZ
+            "oreo": "Mondelez",
+            "ritz": "Mondelez",
+            "chips ahoy": "Mondelez",
+            "belvita": "Mondelez",
+            "triscuit": "Mondelez",
+            "nabisco": "Mondelez",
+
+            # GRUPO BIMBO
+            "bimbo": "Grupo Bimbo",
+            "tia rosa": "Grupo Bimbo",
+            "tía rosa": "Grupo Bimbo",
+            "sanissimo": "Grupo Bimbo",
+            "saníssimo": "Grupo Bimbo",
+            "takis": "Grupo Bimbo",
+
+            # BAUDUCCO
+            "bauducco": "Bauducco",
+
+            # KELLANOVA
+            "pringles": "Kellanova",
+            "kellogg": "Kellanova",
+            "cheez-it": "Kellanova",
+
+            # CAMPBELL'S
+            "pepperidge farm": "Campbell's",
+            "goldfish": "Campbell's",
+
+            # GRUMA
+            "mission": "Gruma",
+            "guerrero": "Gruma",
+            "maseca": "Gruma",
+
+            # TORTILLAS / BAKERY
+            "toufayan": "Toufayan",
+
+            # OTHERS
+            "colombina": "Colombina",
+            "planters": "Hormel / Planters",
+            "snickers": "Mars",
+            "m&m": "Mars",
+            "m&ms": "Mars",
+            "walkers": "Walkers",
+            "mcvitie": "McVitie's",
+            "mcvities": "McVitie's",
+            "reynolds": "Reynolds",
+            "glad": "Glad",
+        }
+
+        return BRAND_GROUPS.get(
+            b,
+            str(brand).strip()
+        )
+
+    regional_df["brand_group"] = (
+        regional_df["brand"]
+        .apply(normalize_brand_group)
+    )
+
+    print("Brand groups normalized.")
     # ==========================================
     # BRAND NORMALIZATION ENGINE
     # Missing brands backlog
@@ -1183,30 +1296,14 @@ def build_regional_dataset():
     )
     # ==================================================
     # FAMILY MATCHING ENGINE
+    # Commercial engine is calculated below
     # ==================================================
-
-    regional_df["family_key"] = (
-        regional_df.apply(
-            build_family_key,
-            axis=1
-        )
-    )
-
-    regional_df["family_overlap"] = (
-        regional_df
-        .groupby("family_key")["country"]
-        .transform("nunique")
-    )
 
     print("\n===================================")
     print(" FAMILY MATCHING ENGINE")
     print("===================================")
 
-    print(
-        regional_df["family_overlap"]
-        .value_counts()
-        .sort_index()
-    )
+    print("Using commercial_overlap engine.")
 
     # ==================================================
     # REGIONAL OVERLAP
@@ -1216,7 +1313,24 @@ def build_regional_dataset():
         regional_df.groupby("match_key")["country"]
         .transform("nunique")
     )
- 
+    print("\nTop Match Keys")
+
+    print(
+        regional_df[
+            regional_df["barcode_harmonized"].notna()
+        ]
+        .groupby("barcode_harmonized")
+        .agg(
+            countries=("country", "nunique"),
+            rows=("country", "count"),
+            product=("product_name", "first")
+        )
+        .sort_values(
+            "countries",
+            ascending=False
+        )
+        .head(20)
+    )
        # ==================================================
     # FAMILY KEY - FUZZY COMMERCIAL MATCH
     # ==================================================
@@ -1224,7 +1338,7 @@ def build_regional_dataset():
     def family_key(row):
 
         brand = normalize_sku_text(row.get("brand", ""))
-        name = normalize_sku_text(row.get("product_name_clean", ""))
+        name = normalize_sku_text(row.get("product_name", ""))
 
         tokens = name.split()
 
@@ -1233,7 +1347,20 @@ def build_regional_dataset():
             if len(t) >= 4
         ][:3]
 
-        return brand + "_" + "_".join(important_tokens)
+        weight = row.get("weight_kg")
+
+        if pd.notna(weight):
+            weight_key = str(round(weight * 1000))
+        else:
+            weight_key = "unknown"
+
+        return (
+            brand
+            + "_"
+            + "_".join(important_tokens)
+            + "_"
+            + weight_key
+        )
 
     regional_df["family_key"] = regional_df.apply(
         family_key,
@@ -1245,6 +1372,13 @@ def build_regional_dataset():
         .transform("nunique")
     )
 
+    print("\nCommercial Overlap")
+
+    print(
+        regional_df["commercial_overlap"]
+        .value_counts()
+        .sort_index()
+    )  
     # ==================================================
     # SAME SKU PRICE GAP
     # ==================================================
@@ -1507,7 +1641,20 @@ def export_regional_files(
 # ======================================================
 # MAIN
 # ======================================================
+def is_file_modified_today(file_path):
 
+    file_path = Path(file_path)
+
+    if not file_path.exists():
+        return False
+
+    file_date = datetime.fromtimestamp(
+        file_path.stat().st_mtime
+    ).strftime("%Y%m%d")
+
+    today = datetime.now().strftime("%Y%m%d")
+
+    return file_date == today
 def main():
 
     print("\n===================================")
@@ -1518,11 +1665,12 @@ def main():
     # RD
     # ==========================================
 
-    if not FORCE_SCRAPE and has_today_file(
-        OUTPUT_RD,
-        "benchmark_rd_master*.csv"
+    rd_master_file = OUTPUT_RD / "benchmark_rd_master.csv"
+
+    if not FORCE_SCRAPE and is_file_modified_today(
+        rd_master_file
     ):
-        print("RD ya tiene archivo de hoy. Se omite scraper RD.")
+        print("RD ya tiene archivo maestro actualizado hoy. Se omite scraper RD.")
 
     else:
 
@@ -1535,11 +1683,15 @@ def main():
     # GUYANA
     # ==========================================
 
-    if not FORCE_SCRAPE and has_today_file(
-        OUTPUT_GUYANA / "lmstudio",
-        "guyana_master_clean_*.csv"
+    guyana_master_file = (
+        OUTPUT_GUYANA /
+        "guyana_master_clean_latest.csv"
+    )
+
+    if not FORCE_SCRAPE and is_file_modified_today(
+        guyana_master_file
     ):
-        print("Guyana ya tiene archivo de hoy. Se omite scraper Guyana.")
+        print("Guyana ya tiene archivo maestro actualizado hoy. Se omite scraper Guyana.")
 
     else:
 
@@ -1552,11 +1704,15 @@ def main():
     # ARUBA
     # ==========================================
 
-    if not FORCE_SCRAPE and has_today_file(
-        OUTPUT_ARUBA,
-        "superfood_aruba_retail_intelligence_*.csv"
+    aruba_master_file = (
+        OUTPUT_ARUBA /
+        "superfood_aruba_retail_intelligence_latest.csv"
+    )
+
+    if not FORCE_SCRAPE and is_file_modified_today(
+        aruba_master_file
     ):
-        print("Aruba ya tiene archivo de hoy. Se omite scraper Aruba.")
+        print("Aruba ya tiene archivo maestro actualizado hoy. Se omite scraper Aruba.")
 
     else:
 
@@ -1565,33 +1721,11 @@ def main():
             "ARUBA SCRAPER"
         )
 
-    regional_df, regional_price_gap = (
-        build_regional_dataset()
-    )
-
-    export_regional_files(
-        regional_df,
-        regional_price_gap
-    )
-
     print("\n===================================")
     print(" CARIBBEAN RETAIL INTELLIGENCE AI")
     print("===================================\n")
 
-    run_script(
-        BASE_DIR / "scrapers/rd_retail_intelligence.py",
-        "RD SCRAPER"
-    )
 
-    run_script(
-        BASE_DIR / "scrapers/guyana_retail_intelligence.py",
-        "GUYANA SCRAPER"
-    )
-
-    run_script(
-        BASE_DIR / "scrapers/superfood_aruba_intelligence.py",
-        "ARUBA SCRAPER"
-    )
 
     regional_df, regional_price_gap = (
         build_regional_dataset()
