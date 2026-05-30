@@ -352,9 +352,11 @@ def scrape_search(category, term):
 def export_lmstudio(df):
     txt_path = LM_DIR / f"aruba_products_rag_{TIMESTAMP}.txt"
     csv_path = LM_DIR / f"aruba_master_clean_{TIMESTAMP}.csv"
+    latest_csv = LM_DIR / "aruba_master_clean_latest.csv"
     jsonl_path = LM_DIR / f"aruba_products_rag_{TIMESTAMP}.jsonl"
 
     df.to_csv(csv_path, index=False, encoding="utf-8-sig")
+    df.to_csv(latest_csv, index=False, encoding="utf-8-sig")
 
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write("ARUBA RETAIL INTELLIGENCE DATABASE\n\n")
@@ -376,6 +378,8 @@ def export_lmstudio(df):
     with open(jsonl_path, "w", encoding="utf-8") as f:
         for _, r in df.iterrows():
             f.write(r.to_json(force_ascii=False) + "\n")
+
+    print(f"Latest CSV: {latest_csv}")
 
     return csv_path, txt_path, jsonl_path
 
@@ -408,8 +412,14 @@ def main():
     excel_path = OUTPUT_DIR / f"aruba_retail_intelligence_{TIMESTAMP}.xlsx"
     csv_path = OUTPUT_DIR / f"aruba_retail_intelligence_{TIMESTAMP}.csv"
 
+    latest_excel = OUTPUT_DIR / "aruba_retail_intelligence_latest.xlsx"
+    latest_csv = OUTPUT_DIR / "aruba_retail_intelligence_latest.csv"
+
     df.to_excel(excel_path, index=False)
     df.to_csv(csv_path, index=False, encoding="utf-8-sig")
+
+    df.to_excel(latest_excel, index=False)
+    df.to_csv(latest_csv, index=False, encoding="utf-8-sig")
 
     lm_csv, lm_txt, lm_jsonl = export_lmstudio(df)
 
@@ -430,6 +440,8 @@ def main():
     print(f"CSV LM Studio: {lm_csv}")
     print(f"TXT RAG: {lm_txt}")
     print(f"JSONL RAG: {lm_jsonl}")
+    print(f"Latest Excel: {latest_excel}")
+    print(f"Latest CSV: {latest_csv}")
 
 
 if __name__ == "__main__":

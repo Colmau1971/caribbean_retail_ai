@@ -11,7 +11,7 @@ import numpy as np
 from pathlib import Path
 from datetime import datetime
 
-
+FORCE_SCRAPE = False
 # ======================================================
 # PATHS
 # ======================================================
@@ -439,8 +439,7 @@ def build_family_key(row):
     return (
         f"{brand}_{descriptor}_{weight_g}"
     )
-
-    # ======================================================
+# ======================================================
 # RUN SCRAPERS
 # ======================================================
 
@@ -469,11 +468,31 @@ def run_script(script_path, name):
 
         print(f"ERROR ejecutando {name}: {e}")
 
+def has_today_file(folder, pattern="*.csv"):
+
+    today = datetime.now().strftime("%Y%m%d")
+
+    files = list(Path(folder).glob(pattern))
+
+    for file in files:
+
+        if today in file.name:
+            return True
+
+    return False
 
 def latest_csv(folder):
 
     if not folder.exists():
         return None
+
+    # Primero buscar archivos latest
+    latest_files = sorted(
+        folder.glob("*latest*.csv")
+    )
+
+    if latest_files:
+        return latest_files[-1]
 
     files = [
         f for f in folder.glob("*.csv")
@@ -491,7 +510,6 @@ def latest_csv(folder):
         files,
         key=lambda x: x.stat().st_mtime
     )
-
 
 # ======================================================
 # LOAD CSV
@@ -1371,9 +1389,19 @@ def export_regional_files(
         / f"caribbean_master_{TIMESTAMP}.xlsx"
     )
 
+    regional_latest_excel = (
+        REGIONAL_OUTPUT
+        / "caribbean_master_latest.xlsx"
+    )
+
     regional_csv = (
         REGIONAL_OUTPUT
         / f"caribbean_master_{TIMESTAMP}.csv"
+    )
+
+    regional_latest_csv = (
+        REGIONAL_OUTPUT
+        / "caribbean_master_latest.csv"
     )
 
     regional_txt = (
@@ -1387,7 +1415,7 @@ def export_regional_files(
     )
 
     with pd.ExcelWriter(
-        regional_excel,
+        regional_latest_excel,
         engine="openpyxl"
     ) as writer:
 
@@ -1402,9 +1430,20 @@ def export_regional_files(
             sheet_name="SKU Price Gaps",
             index=False
         )
+        df.to_excel(
+            writer,
+            sheet_name="Regional Master",
+            index=False
+        )
+
+        regional_price_gap.to_excel(
+            writer,
+            sheet_name="SKU Price Gaps",
+            index=False
+        )
 
     df.to_csv(
-        regional_csv,
+        regional_latest_csv,
         index=False,
         encoding="utf-8-sig"
     )
@@ -1461,6 +1500,8 @@ def export_regional_files(
     print(f"CSV: {regional_csv}")
     print(f"TXT: {regional_txt}")
     print(f"JSONL: {regional_jsonl}")
+    print(f"Latest Excel: {regional_latest_excel}")
+    print(f"Latest CSV: {regional_latest_csv}")
 
 
 # ======================================================
@@ -1468,6 +1509,70 @@ def export_regional_files(
 # ======================================================
 
 def main():
+
+    print("\n===================================")
+    print(" CARIBBEAN RETAIL INTELLIGENCE AI")
+    print("===================================\n")
+
+    # ==========================================
+    # RD
+    # ==========================================
+
+    if not FORCE_SCRAPE and has_today_file(
+        OUTPUT_RD,
+        "benchmark_rd_master*.csv"
+    ):
+        print("RD ya tiene archivo de hoy. Se omite scraper RD.")
+
+    else:
+
+        run_script(
+            BASE_DIR / "scrapers/rd_retail_intelligence.py",
+            "RD SCRAPER"
+        )
+
+    # ==========================================
+    # GUYANA
+    # ==========================================
+
+    if not FORCE_SCRAPE and has_today_file(
+        OUTPUT_GUYANA / "lmstudio",
+        "guyana_master_clean_*.csv"
+    ):
+        print("Guyana ya tiene archivo de hoy. Se omite scraper Guyana.")
+
+    else:
+
+        run_script(
+            BASE_DIR / "scrapers/guyana_retail_intelligence.py",
+            "GUYANA SCRAPER"
+        )
+
+    # ==========================================
+    # ARUBA
+    # ==========================================
+
+    if not FORCE_SCRAPE and has_today_file(
+        OUTPUT_ARUBA,
+        "superfood_aruba_retail_intelligence_*.csv"
+    ):
+        print("Aruba ya tiene archivo de hoy. Se omite scraper Aruba.")
+
+    else:
+
+        run_script(
+            BASE_DIR / "scrapers/superfood_aruba_intelligence.py",
+            "ARUBA SCRAPER"
+        )
+
+    regional_df, regional_price_gap = (
+        build_regional_dataset()
+    )
+
+    export_regional_files(
+        regional_df,
+        regional_price_gap
+    )
 
     print("\n===================================")
     print(" CARIBBEAN RETAIL INTELLIGENCE AI")
@@ -1500,6 +1605,7 @@ def main():
     print("\n===================================")
     print(" PIPELINE FINISHED")
     print("===================================\n")
+
 
 
 if __name__ == "__main__":

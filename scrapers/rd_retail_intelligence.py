@@ -51,7 +51,10 @@ SEARCH_TERMS = {
         "croissant",
         "bagel",
         "brioche",
-        "flatbread",
+        "flatbread","Pan Mini",
+        "Pan Maxi",
+        "Pan con macadamia",
+        "Flat Bread",
     ],
 
     "Pasteleria": [
@@ -121,7 +124,8 @@ MARCAS = [
     "Dave's Killer Bread",
 
     # Sweet Bakery
-    "Bauducco",
+    "Bauducco","Hostess","Entenmann's","little debbie",
+    
 
     # Healthy
     "Simple Mills",

@@ -897,6 +897,12 @@ def export_lmstudio_files(normalized_df: pd.DataFrame):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 
     csv_path = lm_dir / f"guyana_master_clean_{timestamp}.csv"
+
+    latest_csv = (
+        lm_dir /
+        "guyana_master_clean_latest.csv"
+    )
+
     jsonl_path = lm_dir / f"guyana_products_rag_{timestamp}.jsonl"
     txt_path = lm_dir / f"guyana_products_rag_{timestamp}.txt"
 
@@ -905,6 +911,14 @@ def export_lmstudio_files(normalized_df: pd.DataFrame):
         index=False,
         encoding="utf-8-sig"
     )
+
+    normalized_df.to_csv(
+        latest_csv,
+        index=False,
+        encoding="utf-8-sig"
+    )
+
+    print(f"Latest CSV: {latest_csv}")
 
     with open(jsonl_path, "w", encoding="utf-8") as f_jsonl:
 
@@ -1043,13 +1057,22 @@ def create_charts(df: pd.DataFrame):
 
 
 def export_excel(raw_df, normalized_df, summary_df, alerts_df):
+
     file_path = (
         OUTPUT_DIR /
         f"guyana_multi_retailer_intelligence_"
         f"{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
     )
 
-    with pd.ExcelWriter(file_path, engine="openpyxl") as writer:
+    latest_excel = (
+        OUTPUT_DIR /
+        "guyana_multi_retailer_intelligence_latest.xlsx"
+    )
+
+    with pd.ExcelWriter(
+        file_path,
+        engine="openpyxl"
+    ) as writer:
 
         raw_df.to_excel(
             writer,
@@ -1076,22 +1099,37 @@ def export_excel(raw_df, normalized_df, summary_df, alerts_df):
         )
 
         for sheet in writer.sheets.values():
+
             sheet.freeze_panes = "A2"
 
             for col in sheet.columns:
+
                 max_len = max(
                     len(str(cell.value))
-                    if cell.value is not None else 0
+                    if cell.value is not None
+                    else 0
                     for cell in col
                 )
 
                 sheet.column_dimensions[
                     col[0].column_letter
-                ].width = min(max_len + 2, 45)
+                ].width = min(
+                    max_len + 2,
+                    45
+                )
+
+    import shutil
+
+    shutil.copy2(
+        file_path,
+        latest_excel
+    )
+
+    print(
+        f"Latest Excel: {latest_excel}"
+    )
 
     return file_path
-
-
 # =========================
 # MAIN
 # =========================
@@ -1139,6 +1177,62 @@ def main():
         return
 
     normalized_df = normalize_dataframe(raw_df)
+
+    # ==========================================
+    # REMOVE NON-PRODUCT RECORDS
+    # ==========================================
+
+    INVALID_PRODUCT_NAMES = {
+        "Store Theme",
+        "Grocery",
+        "Produce",
+        "Produce Misc",
+        "Frozen Food",
+        "Fresh Meat & Seafood",
+        "Meat & Seafood",
+        "Health",
+        "Beauty",
+        "Canned Products",
+        "Boxed/Canned Meals",
+        "DELI HOT",
+        "DELI CUP",
+        "DELI CUP LID",
+        "DELI MEATS",
+        "DELI MISC",
+    }
+
+    normalized_df = normalized_df[
+        ~normalized_df["product_name"]
+        .astype(str)
+        .str.strip()
+        .isin(INVALID_PRODUCT_NAMES)
+    ]
+
+    INVALID_PATTERNS = [
+        r"^Fresh\s",
+        r"^Produce",
+        r"^Deli\s",
+        r"^DELI",
+        r"^Health",
+        r"^Beauty",
+    ]
+
+    for pattern in INVALID_PATTERNS:
+
+        normalized_df = normalized_df[
+            ~normalized_df["product_name"]
+            .astype(str)
+            .str.contains(
+                pattern,
+                case=False,
+                regex=True,
+                na=False
+            )
+        ]
+
+    print(
+        f"Productos después limpieza Guyana: {len(normalized_df)}"
+    )
 
     summary_df = create_summary(normalized_df)
     alerts_df = create_alerts(normalized_df)
