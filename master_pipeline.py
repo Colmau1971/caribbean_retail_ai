@@ -389,8 +389,58 @@ def harmonize_barcode(barcode):
 
     return pd.NA
 
+def build_family_key(row):
 
-# ======================================================
+    brand = str(
+        row.get("brand", "")
+    ).upper().strip()
+
+    name = str(
+        row.get("product_name", "")
+    ).upper()
+
+    weight = row.get("weight_kg")
+
+    if pd.notna(weight):
+        weight_g = round(weight * 1000)
+    else:
+        weight_g = ""
+
+    name = re.sub(
+        r"[^A-Z0-9 ]",
+        " ",
+        name
+    )
+
+    STOP_WORDS = {
+        "BREAD",
+        "COOKIE",
+        "COOKIES",
+        "CRACKER",
+        "CRACKERS",
+        "CHIPS",
+        "SNACK",
+        "SNACKS",
+        "BAGEL",
+        "WRAP",
+        "WRAPS",
+        "TORTILLA",
+        "TORTILLAS",
+    }
+
+    tokens = [
+        t
+        for t in name.split()
+        if t not in STOP_WORDS
+    ]
+
+    descriptor = "_".join(tokens[:3])
+
+    return (
+        f"{brand}_{descriptor}_{weight_g}"
+    )
+
+    # ======================================================
 # RUN SCRAPERS
 # ======================================================
 
@@ -808,8 +858,8 @@ def build_regional_dataset():
 
     try:
 
-        corrections = pd.read_csv(
-            "brand_corrections.csv"
+        corrections = pd.read_excel(
+            "brand_corrections.xlsx"
         )
 
         corrections.columns = [
@@ -1113,7 +1163,33 @@ def build_regional_dataset():
             + "_unknown"
         )
     )
-    
+    # ==================================================
+    # FAMILY MATCHING ENGINE
+    # ==================================================
+
+    regional_df["family_key"] = (
+        regional_df.apply(
+            build_family_key,
+            axis=1
+        )
+    )
+
+    regional_df["family_overlap"] = (
+        regional_df
+        .groupby("family_key")["country"]
+        .transform("nunique")
+    )
+
+    print("\n===================================")
+    print(" FAMILY MATCHING ENGINE")
+    print("===================================")
+
+    print(
+        regional_df["family_overlap"]
+        .value_counts()
+        .sort_index()
+    )
+
     # ==================================================
     # REGIONAL OVERLAP
     # ==================================================

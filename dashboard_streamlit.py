@@ -169,7 +169,7 @@ with col1:
             barmode="group",
             title="Precio promedio USD/kg por país y categoría"
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     else:
         st.info("No hay datos suficientes de USD/kg para esta vista.")
 
@@ -189,7 +189,7 @@ with col2:
         title="Top marcas por número de SKUs"
     )
     fig.update_layout(yaxis={"categoryorder": "total ascending"})
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 # ==============================
 # OPPORTUNITY ENGINE
@@ -237,7 +237,7 @@ if not opportunity.empty:
             hover_data=["country", "standard_category", "brand_count"],
             title="Opportunity Matrix: surtido vs precio/kg"
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     with col4:
         top_opp = opportunity.sort_values("opportunity_score", ascending=False).head(10)
@@ -251,11 +251,11 @@ if not opportunity.empty:
             title="Top oportunidades regionales"
         )
         fig.update_layout(yaxis={"categoryorder": "total ascending"})
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     st.dataframe(
         opportunity.sort_values("opportunity_score", ascending=False),
-        use_container_width=True
+        width="stretch"
     )
 else:
     st.info("No hay datos suficientes para calcular Opportunity Score.")
@@ -337,14 +337,14 @@ if match_col:
 
             st.plotly_chart(
                 fig,
-                use_container_width=True
+                width="stretch"
             )
 
         with col6:
 
             st.dataframe(
                 sku_cross.head(50),
-                use_container_width=True
+                width="stretch"
             )
 
     else:
@@ -425,7 +425,7 @@ if alerts_path.exists():
 
             st.plotly_chart(
                 fig,
-                use_container_width=True
+                width="stretch"
             )
 
             st.dataframe(
@@ -433,19 +433,19 @@ if alerts_path.exists():
                     "price_change_pct",
                     ascending=False
                 ),
-                use_container_width=True
+                width="stretch"
             )
 
         with st.expander("🆕 Nuevos SKUs"):
             st.dataframe(
                 new_skus,
-                use_container_width=True
+                width="stretch"
             )
 
         with st.expander("❌ Delisted SKUs"):
             st.dataframe(
                 delisted_skus,
-                use_container_width=True
+                width="stretch"
             )
 
     except Exception as e:
@@ -476,11 +476,11 @@ retailer_view = (
     .sort_values("sku_count", ascending=False)
 )
 
-st.dataframe(retailer_view, use_container_width=True)
+st.dataframe(retailer_view, width="stretch")
 
 # ==============================
 # RAW DATA
 # ==============================
 
 with st.expander("Ver data filtrada"):
-    st.dataframe(filtered, use_container_width=True)
+    st.dataframe(filtered, width="stretch")
