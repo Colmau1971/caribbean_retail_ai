@@ -71,23 +71,19 @@ def start_driver():
 
     options = uc.ChromeOptions()
 
-    options.add_argument("--start-maximized")
     options.add_argument("--window-size=1440,1200")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--disable-features=VizDisplayCompositor")
-    options.add_argument("--remote-debugging-port=9222")
-    options.add_argument("--disable-background-timer-throttling")
-    options.add_argument("--disable-backgrounding-occluded-windows")
 
     driver = uc.Chrome(
         options=options,
         version_main=148,
         use_subprocess=True,
     )
+
+    driver.set_page_load_timeout(60)
 
     return driver
 
@@ -793,53 +789,46 @@ def main():
 
     all_products = []
 
-    driver = None
+    for category, terms in SEARCH_TERMS.items():
 
-    try:
-        driver = start_driver()
+        for term in terms:
 
-        if driver is None:
-            print("Chrome no pudo iniciar.")
-            return
+            driver = None
 
-        for category, terms in SEARCH_TERMS.items():
+            try:
 
-            for term in terms:
+                driver = start_driver()
+
+                products = scrape_search(
+                    driver,
+                    category,
+                    term
+                )
+
+                all_products.extend(products)
+
+            except Exception as e:
+
+                print(
+                    f"ERROR EN {category} | {term}: {e}"
+                )
+
+            finally:
 
                 try:
-                    products = scrape_search(
-                        driver,
-                        category,
-                        term,
-                    )
-
-                    all_products.extend(products)
-
-                except Exception as e:
-                    print(f"ERROR EN {category} | {term}: {e}")
-
-                    try:
+                    if driver:
                         driver.quit()
-                    except Exception:
-                        pass
+                except Exception:
+                    pass
 
-                    print("Reiniciando Chrome...")
-                    driver = start_driver()
-
-                time.sleep(5)
-
-    finally:
-        try:
-            if driver:
-                driver.quit()
-        except Exception:
-            pass
+            time.sleep(3)
 
     df = pd.DataFrame(all_products)
 
     if df.empty:
         print("No se encontraron productos.")
         return
+
     df = df.drop_duplicates()
 
     output_file = (
