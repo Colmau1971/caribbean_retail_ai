@@ -1,9 +1,9 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
 import numpy as np
+from glob import glob
 
 # ==============================
 # CONFIG
@@ -25,27 +25,38 @@ st.caption("Pricing, assortment and opportunity intelligence for Caribbean marke
 @st.cache_data
 def load_data():
 
-    from glob import glob
+    preferred_files = [
+        "outputs/regional/caribbean_master_latest.xlsx",
+        "outputs/regional/caribbean_master_latest.csv",
+    ]
 
-    possible_files = sorted(
-        glob("outputs/regional/caribbean_master_*.xlsx"),
-        reverse=True
-    )
+    file_path = None
 
-    if not possible_files:
+    for candidate in preferred_files:
+        if Path(candidate).exists():
+            file_path = candidate
+            break
 
-        st.error(
-            "No encontré el archivo master "
-            "en outputs/regional/"
+    if file_path is None:
+        possible_files = sorted(
+            glob("outputs/regional/caribbean_master_*.xlsx"),
+            reverse=True
         )
 
-        st.stop()
+        if not possible_files:
+            st.error(
+                "No encontré el archivo master en outputs/regional/."
+            )
+            st.stop()
 
-    file_path = possible_files[0]
+        file_path = possible_files[0]
 
     st.success(f"Archivo cargado: {file_path}")
 
-    df = pd.read_excel(file_path)
+    if str(file_path).endswith(".csv"):
+        df = pd.read_csv(file_path)
+    else:
+        df = pd.read_excel(file_path)
 
     df.columns = [
         str(c).strip().lower()
@@ -54,91 +65,9 @@ def load_data():
 
     return df
 
-df = load_data()    
 
-for col in ["country", "standard_category", "retailer", "brand"]:
-    if col not in df.columns:
-        df[col] = "N/A"
-# ==============================
-# BUILD BRAND / CATEGORY INTELLIGENCE
-# ==============================
+df = load_data()
 
-df["price_per_kg_usd"] = pd.to_numeric(
-    df["price_per_kg_usd"],
-    errors="coerce"
-)
-
-if "brand_group" not in df.columns:
-    df["brand_group"] = df["brand"]
-
-brand_intelligence_df = (
-    df.dropna(
-        subset=[
-            "country",
-            "brand",
-            "price_per_kg_usd"
-        ]
-    )
-    .groupby(
-        [
-            "country",
-            "brand"
-        ],
-        as_index=False
-    )
-    .agg(
-        skus=("product_name", "count"),
-        avg_price_kg_usd=("price_per_kg_usd", "mean"),
-        min_price_kg_usd=("price_per_kg_usd", "min"),
-        max_price_kg_usd=("price_per_kg_usd", "max")
-    )
-)
-
-category_intelligence_df = (
-    df.dropna(
-        subset=[
-            "country",
-            "standard_category",
-            "price_per_kg_usd"
-        ]
-    )
-    .groupby(
-        [
-            "country",
-            "standard_category"
-        ],
-        as_index=False
-    )
-    .agg(
-        skus=("product_name", "count"),
-        avg_price_kg_usd=("price_per_kg_usd", "mean"),
-        median_price_kg_usd=("price_per_kg_usd", "median"),
-        max_price_kg_usd=("price_per_kg_usd", "max")
-    )
-)
-
-brand_group_intelligence_df = (
-    df.dropna(
-        subset=[
-            "country",
-            "brand_group",
-            "price_per_kg_usd"
-        ]
-    )
-    .groupby(
-        [
-            "country",
-            "brand_group"
-        ],
-        as_index=False
-    )
-    .agg(
-        skus=("product_name", "count"),
-        avg_price_kg_usd=("price_per_kg_usd", "mean"),
-        min_price_kg_usd=("price_per_kg_usd", "min"),
-        max_price_kg_usd=("price_per_kg_usd", "max")
-    )
-)        
 # ==============================
 # COLUMN NORMALIZATION
 # ==============================
@@ -153,6 +82,24 @@ if "price_per_kg_usd" not in df.columns:
 for col in ["country", "standard_category", "retailer", "brand"]:
     if col not in df.columns:
         df[col] = "N/A"
+
+if "brand_group" not in df.columns:
+    df["brand_group"] = df["brand"]
+
+if "product_name" not in df.columns:
+    df["product_name"] = "N/A"
+
+if "price_usd" not in df.columns:
+    df["price_usd"] = np.nan
+
+if "price_per_kg_usd" not in df.columns:
+    df["price_per_kg_usd"] = np.nan
+
+for col in ["price_usd", "price_per_kg_usd"]:
+    df[col] = pd.to_numeric(
+        df[col],
+        errors="coerce"
+    )
 
 # ==============================
 # SIDEBAR FILTERS
@@ -182,16 +129,30 @@ brands = st.sidebar.multiselect(
     sorted(df["brand"].dropna().astype(str).unique())
 )
 
+brand_groups = st.sidebar.multiselect(
+    "Marca homologada / Grupo",
+    sorted(df["brand_group"].dropna().astype(str).unique())
+)
+
 filtered = df[
     df["country"].isin(countries)
     & df["standard_category"].isin(categories)
 ].copy()
 
 if retailers:
-    filtered = filtered[filtered["retailer"].astype(str).isin(retailers)]
+    filtered = filtered[
+        filtered["retailer"].astype(str).isin(retailers)
+    ]
 
 if brands:
-    filtered = filtered[filtered["brand"].astype(str).isin(brands)]
+    filtered = filtered[
+        filtered["brand"].astype(str).isin(brands)
+    ]
+
+if brand_groups:
+    filtered = filtered[
+        filtered["brand_group"].astype(str).isin(brand_groups)
+    ]
 
 # ==============================
 # KPIs
@@ -213,11 +174,7 @@ else:
 total_countries = filtered["country"].nunique()
 total_categories = filtered["standard_category"].nunique()
 
-avg_price_kg = (
-    filtered["price_per_kg_usd"].median()
-    if "price_per_kg_usd" in filtered.columns
-    else None
-)
+avg_price_kg = filtered["price_per_kg_usd"].median()
 
 kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
 
@@ -225,7 +182,10 @@ kpi1.metric("Total Records", f"{total_records:,.0f}")
 kpi2.metric("Unique SKUs", f"{unique_skus:,.0f}")
 kpi3.metric("Países", f"{total_countries}")
 kpi4.metric("Categorías", f"{total_categories}")
-kpi5.metric("Precio prom. USD/kg", f"${avg_price_kg:,.2f}" if pd.notna(avg_price_kg) else "N/A")
+kpi5.metric(
+    "Precio prom. USD/kg",
+    f"${avg_price_kg:,.2f}" if pd.notna(avg_price_kg) else "N/A"
+)
 
 st.divider()
 
@@ -255,7 +215,7 @@ with col1:
         )
         st.plotly_chart(fig, width="stretch")
     else:
-        st.info("No hay datos suficientes para Brand Intelligence.")
+        st.info("No hay datos suficientes de USD/kg para esta vista.")
 
 with col2:
     top_brands = (
@@ -265,15 +225,18 @@ with col2:
         .head(15)
     )
 
-    fig = px.bar(
-        top_brands,
-        x="skus",
-        y="brand",
-        orientation="h",
-        title="Top marcas por número de SKUs"
-    )
-    fig.update_layout(yaxis={"categoryorder": "total ascending"})
-    st.plotly_chart(fig, width="stretch")
+    if not top_brands.empty:
+        fig = px.bar(
+            top_brands,
+            x="skus",
+            y="brand",
+            orientation="h",
+            title="Top marcas por número de SKUs"
+        )
+        fig.update_layout(yaxis={"categoryorder": "total ascending"})
+        st.plotly_chart(fig, width="stretch")
+    else:
+        st.info("No hay datos suficientes de marcas.")
 
 # ==============================
 # OPPORTUNITY ENGINE
@@ -324,7 +287,10 @@ if not opportunity.empty:
         st.plotly_chart(fig, width="stretch")
 
     with col4:
-        top_opp = opportunity.sort_values("opportunity_score", ascending=False).head(10)
+        top_opp = opportunity.sort_values(
+            "opportunity_score",
+            ascending=False
+        ).head(10)
 
         fig = px.bar(
             top_opp,
@@ -350,10 +316,41 @@ else:
 
 st.subheader("🏷️ Brand Intelligence")
 
-if not brand_intelligence_df.empty:
+view_type = st.radio(
+    "Brand Analysis",
+    ["Brand", "Brand Group"],
+    horizontal=True
+)
 
+if view_type == "Brand":
+    brand_col = "brand"
+else:
+    brand_col = "brand_group"
+
+brand_view = (
+    filtered.dropna(
+        subset=[
+            "country",
+            brand_col,
+            "price_per_kg_usd"
+        ]
+    )
+    .groupby(
+        ["country", brand_col],
+        as_index=False
+    )
+    .agg(
+        skus=("product_name", "count"),
+        avg_price_kg_usd=("price_per_kg_usd", "mean"),
+        min_price_kg_usd=("price_per_kg_usd", "min"),
+        max_price_kg_usd=("price_per_kg_usd", "max")
+    )
+    .rename(columns={brand_col: "brand"})
+)
+
+if not brand_view.empty:
     top_brand_price = (
-        brand_intelligence_df
+        brand_view
         .sort_values(
             "avg_price_kg_usd",
             ascending=False
@@ -375,16 +372,17 @@ if not brand_intelligence_df.empty:
     )
 
     st.dataframe(
-        brand_intelligence_df.sort_values(
+        brand_view.sort_values(
             "avg_price_kg_usd",
             ascending=False
         ),
         width="stretch"
     )
+
     st.subheader("🌎 Brand Regional Presence")
 
     brand_presence = (
-        brand_intelligence_df
+        brand_view
         .groupby("brand", as_index=False)
         .agg(
             countries=("country", "nunique"),
@@ -417,19 +415,82 @@ if not brand_intelligence_df.empty:
         width="stretch"
     )
 else:
+    st.info("No hay datos suficientes para Brand Intelligence.")
 
-    st.info(
-        "No hay datos suficientes para Brand Intelligence."
+# ==============================
+# COMPETITIVE LANDSCAPE
+# ==============================
+
+st.subheader("🏢 Competitive Landscape")
+
+competitive = (
+    filtered.dropna(
+        subset=[
+            "brand_group",
+            "price_per_kg_usd"
+        ]
     )
-    
+    .groupby("brand_group", as_index=False)
+    .agg(
+        countries=("country", "nunique"),
+        skus=("product_name", "count"),
+        avg_price_kg=("price_per_kg_usd", "mean"),
+        min_price_kg=("price_per_kg_usd", "min"),
+        max_price_kg=("price_per_kg_usd", "max")
+    )
+    .sort_values(
+        ["countries", "skus"],
+        ascending=False
+    )
+)
+
+if not competitive.empty:
+    fig = px.scatter(
+        competitive.head(50),
+        x="skus",
+        y="avg_price_kg",
+        size="countries",
+        color="countries",
+        hover_data=["brand_group", "min_price_kg", "max_price_kg"],
+        title="Competitive Landscape: Presence vs Price Position"
+    )
+
+    st.plotly_chart(fig, width="stretch")
+
+    st.dataframe(
+        competitive,
+        width="stretch"
+    )
+else:
+    st.info("No hay datos suficientes para Competitive Landscape.")
+
 # ==============================
 # CATEGORY INTELLIGENCE
 # ==============================
 
 st.subheader("📊 Category Intelligence")
 
-if not category_intelligence_df.empty:
+category_intelligence_df = (
+    filtered.dropna(
+        subset=[
+            "country",
+            "standard_category",
+            "price_per_kg_usd"
+        ]
+    )
+    .groupby(
+        ["country", "standard_category"],
+        as_index=False
+    )
+    .agg(
+        skus=("product_name", "count"),
+        avg_price_kg_usd=("price_per_kg_usd", "mean"),
+        median_price_kg_usd=("price_per_kg_usd", "median"),
+        max_price_kg_usd=("price_per_kg_usd", "max")
+    )
+)
 
+if not category_intelligence_df.empty:
     fig = px.bar(
         category_intelligence_df,
         x="standard_category",
@@ -454,20 +515,18 @@ if not category_intelligence_df.empty:
         .round(2)
     )
 
-    st.subheader(
-        "Regional Category Matrix USD/kg"
-    )
+    st.subheader("Regional Category Matrix USD/kg")
 
     st.dataframe(
         category_matrix,
         width="stretch"
     )
+
     st.subheader("📈 Category Index (RD = 100)")
 
     index_matrix = category_matrix.copy()
 
     if "Dominican Republic" in index_matrix.columns:
-
         rd_base = index_matrix["Dominican Republic"]
 
         index_matrix = (
@@ -504,17 +563,11 @@ if not category_intelligence_df.empty:
             fig,
             width="stretch"
         )
-
     else:
-
-        st.info(
-            "No se encontró Dominican Republic para calcular RD = 100."
-        ) 
+        st.info("No se encontró Dominican Republic para calcular RD = 100.")
 else:
+    st.info("No hay datos suficientes para Category Intelligence.")
 
-    st.info(
-        "No hay datos suficientes para Category Intelligence."
-    )        
 # ==============================
 # SAME SKU CROSS COUNTRY
 # ==============================
@@ -525,18 +578,14 @@ match_col = None
 
 if "family_key" in filtered.columns:
     match_col = "family_key"
-
 elif "match_key" in filtered.columns:
     match_col = "match_key"
-
 elif "barcode_harmonized" in filtered.columns:
     match_col = "barcode_harmonized"
-
 elif "barcode" in filtered.columns:
     match_col = "barcode"
 
 if match_col:
-
     sku_cross = (
         filtered[
             filtered[match_col].notna()
@@ -558,7 +607,6 @@ if match_col:
     ]
 
     if not sku_cross.empty:
-
         sku_cross["price_gap_pct"] = np.where(
             sku_cross["min_price"] > 0,
             (
@@ -577,7 +625,6 @@ if match_col:
         col5, col6 = st.columns(2)
 
         with col5:
-
             fig = px.scatter(
                 sku_cross.head(100),
                 x="min_price",
@@ -597,26 +644,19 @@ if match_col:
             )
 
         with col6:
-
             st.dataframe(
                 sku_cross.head(50),
                 width="stretch"
             )
-
     else:
-
         st.info(
-            "No se encontraron SKUs "
-            "compartidos entre países."
+            "No se encontraron SKUs compartidos entre países."
         )
-
 else:
-
     st.info(
-        "No existe columna "
-        "family_key/match_key."
+        "No existe columna family_key/match_key."
     )
-    
+
 # ==============================
 # PRICE ALERTS
 # ==============================
@@ -628,9 +668,7 @@ alerts_path = Path(
 )
 
 if alerts_path.exists():
-
     try:
-
         price_changes = pd.read_excel(
             alerts_path,
             sheet_name="Price Changes"
@@ -648,23 +686,11 @@ if alerts_path.exists():
 
         a1, a2, a3 = st.columns(3)
 
-        a1.metric(
-            "Cambios precio",
-            len(price_changes)
-        )
-
-        a2.metric(
-            "Nuevos SKUs",
-            len(new_skus)
-        )
-
-        a3.metric(
-            "Delisted SKUs",
-            len(delisted_skus)
-        )
+        a1.metric("Cambios precio", len(price_changes))
+        a2.metric("Nuevos SKUs", len(new_skus))
+        a3.metric("Delisted SKUs", len(delisted_skus))
 
         if not price_changes.empty:
-
             price_changes["movement"] = np.where(
                 price_changes["price_change_pct"] > 0,
                 "Increase",
@@ -703,18 +729,11 @@ if alerts_path.exists():
                 delisted_skus,
                 width="stretch"
             )
-
     except Exception as e:
-
-        st.error(
-            f"Error cargando alerts: {e}"
-        )
-
+        st.error(f"Error cargando alerts: {e}")
 else:
+    st.info("No existe price_alerts.xlsx")
 
-    st.info(
-        "No existe price_alerts.xlsx"
-    )    
 # ==============================
 # RETAILER BENCHMARK
 # ==============================
@@ -726,7 +745,7 @@ retailer_view = (
     .agg(
         sku_count=("brand", "count"),
         brands=("brand", "nunique"),
-        avg_price_usd=("price_usd", "mean") if "price_usd" in filtered.columns else ("brand", "count"),
+        avg_price_usd=("price_usd", "mean"),
         avg_price_kg=("price_per_kg_usd", "mean")
     )
     .sort_values("sku_count", ascending=False)
