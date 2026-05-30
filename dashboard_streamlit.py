@@ -56,30 +56,89 @@ def load_data():
 
 df = load_data()    
 
+for col in ["country", "standard_category", "retailer", "brand"]:
+    if col not in df.columns:
+        df[col] = "N/A"
 # ==============================
-# BRAND / CATEGORY INTELLIGENCE
+# BUILD BRAND / CATEGORY INTELLIGENCE
 # ==============================
 
-brand_file = Path(
-    "outputs/regional/brand_country_price_kg.xlsx"
+df["price_per_kg_usd"] = pd.to_numeric(
+    df["price_per_kg_usd"],
+    errors="coerce"
 )
 
-category_file = Path(
-    "outputs/regional/category_country_price_kg.xlsx"
+if "brand_group" not in df.columns:
+    df["brand_group"] = df["brand"]
+
+brand_intelligence_df = (
+    df.dropna(
+        subset=[
+            "country",
+            "brand",
+            "price_per_kg_usd"
+        ]
+    )
+    .groupby(
+        [
+            "country",
+            "brand"
+        ],
+        as_index=False
+    )
+    .agg(
+        skus=("product_name", "count"),
+        avg_price_kg_usd=("price_per_kg_usd", "mean"),
+        min_price_kg_usd=("price_per_kg_usd", "min"),
+        max_price_kg_usd=("price_per_kg_usd", "max")
+    )
 )
 
-brand_intelligence_df = pd.DataFrame()
-category_intelligence_df = pd.DataFrame()
-
-if brand_file.exists():
-    brand_intelligence_df = pd.read_excel(
-        brand_file
+category_intelligence_df = (
+    df.dropna(
+        subset=[
+            "country",
+            "standard_category",
+            "price_per_kg_usd"
+        ]
     )
-
-if category_file.exists():
-    category_intelligence_df = pd.read_excel(
-        category_file
+    .groupby(
+        [
+            "country",
+            "standard_category"
+        ],
+        as_index=False
     )
+    .agg(
+        skus=("product_name", "count"),
+        avg_price_kg_usd=("price_per_kg_usd", "mean"),
+        median_price_kg_usd=("price_per_kg_usd", "median"),
+        max_price_kg_usd=("price_per_kg_usd", "max")
+    )
+)
+
+brand_group_intelligence_df = (
+    df.dropna(
+        subset=[
+            "country",
+            "brand_group",
+            "price_per_kg_usd"
+        ]
+    )
+    .groupby(
+        [
+            "country",
+            "brand_group"
+        ],
+        as_index=False
+    )
+    .agg(
+        skus=("product_name", "count"),
+        avg_price_kg_usd=("price_per_kg_usd", "mean"),
+        min_price_kg_usd=("price_per_kg_usd", "min"),
+        max_price_kg_usd=("price_per_kg_usd", "max")
+    )
+)        
 # ==============================
 # COLUMN NORMALIZATION
 # ==============================
@@ -196,7 +255,7 @@ with col1:
         )
         st.plotly_chart(fig, width="stretch")
     else:
-        st.info("No hay datos suficientes de USD/kg para esta vista.")
+        st.info("No hay datos suficientes para Brand Intelligence.")
 
 with col2:
     top_brands = (
@@ -360,7 +419,7 @@ if not brand_intelligence_df.empty:
 else:
 
     st.info(
-        "No existe brand_country_price_kg.xlsx"
+        "No hay datos suficientes para Brand Intelligence."
     )
     
 # ==============================
@@ -454,7 +513,7 @@ if not category_intelligence_df.empty:
 else:
 
     st.info(
-        "No existe category_country_price_kg.xlsx"
+        "No hay datos suficientes para Category Intelligence."
     )        
 # ==============================
 # SAME SKU CROSS COUNTRY
