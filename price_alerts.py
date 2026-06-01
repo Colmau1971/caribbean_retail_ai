@@ -10,9 +10,14 @@ ALERT_DIR = REGIONAL_DIR / "alerts"
 ALERT_DIR.mkdir(parents=True, exist_ok=True)
 
 files = sorted(
-    REGIONAL_DIR.glob("*.csv"),
+    REGIONAL_DIR.glob("caribbean_master_*.csv"),
     key=lambda x: x.stat().st_mtime
 )
+
+files = [
+    f for f in files
+    if f.name != "caribbean_master_latest.csv"
+]
 
 if len(files) < 2:
     print("Se necesitan al menos 2 snapshots regionales.")
