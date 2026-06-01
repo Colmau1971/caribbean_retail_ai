@@ -7,6 +7,7 @@ import re
 import subprocess
 import pandas as pd
 import numpy as np
+import shutil
 
 from pathlib import Path
 from datetime import datetime
@@ -27,6 +28,13 @@ REGIONAL_OUTPUT.mkdir(parents=True, exist_ok=True)
 
 LM_OUTPUT = BASE_DIR / "lmstudio"
 LM_OUTPUT.mkdir(parents=True, exist_ok=True)
+
+# ======================================================
+# STREAMLIT CLOUD
+# ======================================================
+
+STREAMLIT_DATA = BASE_DIR / "streamlit_data"
+STREAMLIT_DATA.mkdir(parents=True, exist_ok=True)
 
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M")
 
@@ -470,6 +478,7 @@ def build_family_key(row):
 # ======================================================
 
 def run_script(script_path, name):
+
 
     print("\n===================================")
     print(f" RUNNING {name}")
@@ -1625,6 +1634,20 @@ def export_regional_files(
                 row.to_json(force_ascii=False)
                 + "\n"
             )
+
+    files_to_publish = [
+        regional_latest_excel,
+        regional_latest_csv,
+        REGIONAL_OUTPUT / "alerts/price_alerts.xlsx",
+        REGIONAL_OUTPUT / "insights/regional_insights.xlsx",
+    ]
+
+    for file in files_to_publish:
+        if file.exists():
+            shutil.copy2(
+                file,
+                STREAMLIT_DATA / file.name
+            )            
 
     print("\n===================================")
     print(" REGIONAL FILES CREATED")
