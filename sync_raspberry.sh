@@ -1,20 +1,16 @@
 #!/bin/bash
 
-echo "==================================="
-echo " SINCRONIZANDO RASPBERRY"
-echo "==================================="
+cd ~/Documents/caribbean_retail_ai
 
-rsync -avz outputs/ \
+echo "Sincronizando outputs a Raspberry..."
+
+rsync -avz --progress outputs/ \
 gonzalezmauricio2@192.168.50.36:/mnt/caribbean/caribbean_retail_ai/outputs/
 
-rsync -avz lmstudio/ \
+rsync -avz --progress lmstudio/ \
 gonzalezmauricio2@192.168.50.36:/mnt/caribbean/caribbean_retail_ai/lmstudio/
 
-echo ""
-echo "Verificando Streamlit..."
+rsync -avz --progress streamlit_data/ \
+gonzalezmauricio2@192.168.50.36:/mnt/caribbean/caribbean_retail_ai/streamlit_data/
 
-ssh gonzalezmauricio2@192.168.50.36 \
-'ps aux | grep streamlit | grep -v grep'
-
-echo ""
-echo "Proceso completado."
+echo "Sync Raspberry terminado."
