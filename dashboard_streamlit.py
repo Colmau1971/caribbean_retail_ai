@@ -26,8 +26,8 @@ st.caption("Pricing, assortment and opportunity intelligence for Caribbean marke
 def load_data():
 
     preferred_files = [
-        "outputs/regional/caribbean_master_latest.xlsx",
-        "outputs/regional/caribbean_master_latest.csv",
+        "streamlit_data/caribbean_master_latest.xlsx",
+        "streamlit_data/caribbean_master_latest.csv",
     ]
 
     file_path = None
@@ -39,13 +39,13 @@ def load_data():
 
     if file_path is None:
         possible_files = sorted(
-            glob("outputs/regional/caribbean_master_*.xlsx"),
+            glob("streamlit_data/caribbean_master_latest.xlsx"),
             reverse=True
         )
 
         if not possible_files:
             st.error(
-                "No encontré el archivo master en outputs/regional/."
+                "No encontré el archivo master en streamlit_data/."
             )
             st.stop()
 
@@ -664,7 +664,7 @@ else:
 st.subheader("🚨 Price Alerts")
 
 alerts_path = Path(
-    "outputs/regional/alerts/price_alerts.xlsx"
+    "streamlit_data/price_alerts.xlsx"
 )
 
 if alerts_path.exists():
