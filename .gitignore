@@ -11,3 +11,4 @@ lmstudio/
 *.xlsx
 *.csv
 *.log
+master_pipeline_backup.py
