@@ -1,17 +1,17 @@
 """
 SUPER FOOD ARUBA RETAIL INTELLIGENCE
-FINAL VERSION
 - Selenium
 - Multi-page scraping
 - Barcode / UPC / GTIN extraction
 - Aruba price normalization
 - Product block segmentation
-- LM Studio exports
+- Centralized brand dictionary
 """
 
 import re
 import time
 import pandas as pd
+import sys
 
 from pathlib import Path
 from datetime import datetime
@@ -20,6 +20,13 @@ import undetected_chromedriver as uc
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
+
+from brand_dictionary import infer_brand
 
 
 BASE_URL = "https://shop.superfoodaruba.com"
@@ -48,19 +55,23 @@ SEARCH_TERMS = {
         "whole wheat bread",
         "bagel",
         "buns",
-        "rolls"
-    ],
-    "Tortillas & Wraps": [
-        "tortilla",
-        "wrap"
+        "rolls",
+        "flatbread",
+        "naan",
+        "pita",
     ],
 
+    "Tortillas & Wraps": [
+        "tortilla",
+        "wrap",
+        "flatbread",
+    ],
 
     "Cookies & Crackers": [
         "oreo",
         "cookies",
         "crackers",
-        "wafer"
+        "wafer",
     ],
 
     "Snacks": [
@@ -68,10 +79,11 @@ SEARCH_TERMS = {
         "tostitos",
         "doritos",
         "cheetos",
-        "lays"
+        "lays",
     ],
+
     "Frozen Bakery": [
-        "frozen"
+        "frozen",
     ],
 }
 
@@ -96,6 +108,7 @@ def start_driver():
 
     return driver
 
+
 def build_search_url(term):
 
     return (
@@ -110,7 +123,6 @@ def extract_barcode(text):
         return None
 
     patterns = [
-
         r'"gtin13"\s*:\s*"?(\d+)"?',
         r'"gtin12"\s*:\s*"?(\d+)"?',
         r'"gtin14"\s*:\s*"?(\d+)"?',
@@ -119,10 +131,9 @@ def extract_barcode(text):
         r'"upc"\s*:\s*"?(\d+)"?',
         r'"barcode"\s*:\s*"?(\d+)"?',
         r'"sku"\s*:\s*"?(\d{8,14})"?',
-
-        r'\b(\d{12})\b',
-        r'\b(\d{13})\b',
-        r'\b(\d{14})\b',
+        r"\b(\d{12})\b",
+        r"\b(\d{13})\b",
+        r"\b(\d{14})\b",
     ]
 
     for pattern in patterns:
@@ -181,13 +192,14 @@ def convert_to_kg(value, unit):
     return None
 
 
-def extract_weight_kg(name):
+def extract_weight_kg(text):
 
-    if not name:
+    if not text:
         return None
 
     text = (
-        name.lower()
+        str(text)
+        .lower()
         .replace(",", ".")
     )
 
@@ -225,136 +237,6 @@ def extract_weight_kg(name):
     return None
 
 
-def infer_brand(name):
-
-    if not name:
-        return None
-
-    name_clean = (
-        str(name)
-        .lower()
-        .replace("-", " ")
-        .strip()
-    )
-
-    BRAND_KEYWORDS = {
-
-        # BIMBO
-        "tia rosa": "Tía Rosa",
-        "sanissimo": "Saníssimo",
-        "bimbo": "Bimbo",
-        "takis": "Takis",
-
-        # MONDELEZ
-        "oreo": "Oreo",
-        "ritz": "Ritz",
-        "belvita": "Belvita",
-        "chips ahoy": "Chips Ahoy",
-        "triscuit": "Triscuit",
-
-        # PEPSICO
-        "lays": "Lays",
-        "lay's": "Lays",
-        "doritos": "Doritos",
-        "cheetos": "Cheetos",
-        "tostitos": "Tostitos",
-        "pringles": "Pringles",
-        "sun chips": "Sun Chips",
-        "santitas": "Santitas",
-
-        # CAMPBELL
-        "pepperidge": "Pepperidge Farm",
-        "goldfish": "Goldfish",
-
-        # GRUMA
-        "mission": "Mission",
-
-        # TOUFAYAN
-        "toufayan": "Toufayan",
-
-        # GENERAL
-        "nature valley": "Nature Valley",
-        "wonder": "Wonder",
-        "sara lee": "Sara Lee",
-        "thomas": "Thomas",
-        "entenmann": "Entenmann",
-        "old el paso": "Old El Paso",
-        "quaker": "Quaker",
-        "nabisco": "Nabisco",
-        "bauducco": "Bauducco",
-        "mcvitie": "McVitie",
-        "kellogg": "Kellogg",
-        "jumbo": "Jumbo",
-        "stacy's": "Stacy's",
-
-        # NUEVAS MARCAS ARUBA
-        "food club": "Food Club",
-        "goya": "Goya",
-        "noel": "Noel",
-        "siete": "Siete",
-        "ricola": "Ricola",
-        "kinder": "Kinder",
-        "dove": "Dove",
-        "glad": "Glad",
-        "reynolds": "Reynolds",
-        "bigelow": "Bigelow",
-        "santa maria": "Santa Maria",
-        "crav'n": "Crav'n",
-        "kraft": "Kraft",
-
-        # EUROPEAN / IMPORTED
-        "lu ": "LU",
-        "lu mini": "LU",
-        "lu tuc": "LU",
-        "wasa": "WASA",
-        "blue diamond": "Blue Diamond",
-        "schar": "Schar",
-        "laurieri": "Laurieri",
-        "laureri": "Laurieri",
-        "bolletje": "Bolletje",
-        "van der meulen": "Van Der Meulen",
-        "ducales": "Ducales",
-        "town house": "Town House",
-        "crunchmaster": "Crunchmaster",
-        "glutino": "Glutino",
-        "hollandia": "Hollandia",
-        "gullon": "Gullon",
-        "haust": "Haust",
-        "fjord": "Fjord",
-        "jos poell": "Jos Poell",
-        "bayman": "Bayman",
-        "gerber": "Gerber",
-        "eggo":"EGGO",
-        "stouffer's":"STOUFFER'S",
-        "digiorno":"DIGIORNO",
-        "kinnikinnick":"Kinnikinnick",
-        "becky's":"BECKY'S",
-
-        # NEW BRANDS
-
-        "colombina": "Colombina",
-        "planters": "Planters",
-        "snickers": "Snickers",
-        "ovaltine": "Ovaltine",
-        "mcvities": "McVitie's",
-        "walkers": "Walkers",
-        "glad": "Glad",
-        "reynolds": "Reynolds",
-        "toppers": "Toppers",
-        "soldanza": "Soldanza",
-        "motto": "Motto",
-        "phidelia": "Phidelia",
-        "whytes": "Whytes"
-    }
-    
-    for keyword, brand in BRAND_KEYWORDS.items():
-
-        if keyword in name_clean:
-            return brand
-
-    return "Other"
-
-
 def classify_category(name, source_category):
 
     if not name:
@@ -362,12 +244,15 @@ def classify_category(name, source_category):
 
     n = name.lower()
 
+    if "pita chips" in n:
+        return "Snacks"
+
     if any(
         x in n
         for x in [
             "tortilla",
             "wrap",
-            "flatbread"
+            "flatbread",
         ]
     ):
         return "Tortillas & Wraps"
@@ -380,7 +265,9 @@ def classify_category(name, source_category):
             "roll",
             "bagel",
             "loaf",
-            "baguette"
+            "baguette",
+            "pita",
+            "naan",
         ]
     ):
         return "Bakery"
@@ -390,7 +277,7 @@ def classify_category(name, source_category):
         for x in [
             "cookie",
             "biscuit",
-            "wafer"
+            "wafer",
         ]
     ):
         return "Cookies"
@@ -404,7 +291,7 @@ def classify_category(name, source_category):
             "chips",
             "snack",
             "popcorn",
-            "pretzel"
+            "pretzel",
         ]
     ):
         return "Snacks"
@@ -453,7 +340,8 @@ def clean_product_name(text):
     ).strip()
 
     weight_match = re.search(
-        r"([0-9]+(?:\.[0-9]+)?\s?(?:oz|kg|g|gr|lb|lbs))",
+        r"([0-9]+(?:\.[0-9]+)?\s?"
+        r"(?:oz|kg|g|gr|lb|lbs))",
         text,
         re.IGNORECASE
     )
@@ -465,7 +353,8 @@ def clean_product_name(text):
     )
 
     core = re.sub(
-        r"([0-9]+(?:\.[0-9]+)?\s?(?:oz|kg|g|gr|lb|lbs))",
+        r"([0-9]+(?:\.[0-9]+)?\s?"
+        r"(?:oz|kg|g|gr|lb|lbs))",
         "",
         text,
         flags=re.IGNORECASE
@@ -507,85 +396,6 @@ def clean_product_name(text):
 
     return final.strip()
 
-    if not text:
-        return None
-
-    text = BeautifulSoup(
-        text,
-        "lxml"
-    ).get_text(" ", strip=True)
-
-    cleanup = [
-        "Remove from List",
-        "Add to Cart",
-        "Add to cart",
-        "Sale price",
-        "Original price:",
-        "Original price",
-    ]
-
-    for c in cleanup:
-        text = text.replace(c, "")
-
-    text = re.sub(r"\s+", " ", text).strip()
-
-    # Remover precio inicial: ƒ8.99
-    text = re.sub(
-        r"^ƒ\s*\d+(?:\.\d+)?\s*",
-        "",
-        text
-    ).strip()
-
-    # Remover prefijos basura frecuentes
-    text = re.sub(
-        r"^(ram|r)\s+",
-        "",
-        text,
-        flags=re.IGNORECASE
-    ).strip()
-
-    # EXTRAER PESO
-    weight_match = re.search(
-        r"([0-9]+(?:\.[0-9]+)?\s?(?:oz|kg|g|gr|lb|lbs))",
-        text,
-        re.IGNORECASE
-    )
-
-    weight = (
-        weight_match.group(1)
-        if weight_match
-        else ""
-    )
-
-    # ELIMINAR PESO DEL NOMBRE
-    core = re.sub(
-        r"([0-9]+(?:\.[0-9]+)?\s?(?:oz|kg|g|gr|lb|lbs))",
-        "",
-        text,
-        flags=re.IGNORECASE
-    ).strip()
-
-    # Remover unidades iniciales que no son marca
-    core = re.sub(
-        r"^\d+\s*(ct|pc|bg|st|ft)\s+",
-        "",
-        core,
-        flags=re.IGNORECASE
-    ).strip()
-
-    # LIMPIEZA FINAL
-    core = core.replace("|", " ")
-    core = re.sub(r"\s+", " ", core).strip()
-
-    # BRAND
-    brand = infer_brand(core)
-
-    final = f"{brand} | {core}"
-
-    if weight:
-        final += f" | {weight}"
-
-    return final.strip()
 
 def scroll_page(driver):
 
@@ -646,19 +456,12 @@ def go_to_page(driver, page):
         return False
 
 
-def is_relevant_product(
-    category,
-    product_name
-):
+def is_relevant_product(category, product_name):
 
     if not product_name:
         return False
 
     name = product_name.lower()
-
-    # ==========================================
-    # BAKERY
-    # ==========================================
 
     if category == "Bakery":
 
@@ -674,6 +477,8 @@ def is_relevant_product(
             "toast",
             "brioche",
             "pita",
+            "naan",
+            "flatbread",
         ]
 
         invalid_terms = [
@@ -685,6 +490,7 @@ def is_relevant_product(
             "angus",
             "hot dogs",
             "chicken burger",
+            "pita chips",
         ]
 
         if any(
@@ -698,10 +504,6 @@ def is_relevant_product(
             for term in bakery_terms
         )
 
-    # ==========================================
-    # FROZEN BAKERY
-    # ==========================================
-
     if category == "Frozen Bakery":
 
         bakery_terms = [
@@ -728,39 +530,6 @@ def is_relevant_product(
         )
 
     return True
-
-    if not product_name:
-        return False
-
-    name = product_name.lower()
-
-    if category == "Frozen Bakery":
-
-        bakery_terms = [
-            "bread",
-            "bun",
-            "buns",
-            "bagel",
-            "roll",
-            "rolls",
-            "croissant",
-            "muffin",
-            "waffle",
-            "waffles",
-            "pancake",
-            "pancakes",
-            "pizza",
-            "flatbread",
-            "tortilla",
-        ]
-
-        return any(
-            term in name
-            for term in bakery_terms
-        )
-
-    return True
-
 
 
 def parse_products_from_html(
@@ -832,7 +601,7 @@ def parse_products_from_html(
             name
         ):
             continue
-    
+
         barcode = normalize_barcode(
             extract_barcode(block)
         )
@@ -849,7 +618,7 @@ def parse_products_from_html(
 
         seen.add(key)
 
-        weight_kg = extract_weight_kg(name)
+        weight_kg = extract_weight_kg(text)
 
         price_usd = (
             price_local / 1.79
@@ -868,43 +637,28 @@ def parse_products_from_html(
                 "scrape_date": datetime.now().strftime(
                     "%Y-%m-%d %H:%M:%S"
                 ),
-
                 "country": COUNTRY,
                 "retailer": RETAILER,
-
                 "source_category": category,
                 "search_term": term,
-
                 "page": page,
-
                 "category": classify_category(
                     name,
                     category
                 ),
-
                 "brand": infer_brand(name),
-
                 "product_name": name,
-
                 "barcode": barcode,
-
                 "barcode_length": (
                     len(barcode)
                     if barcode
                     else None
                 ),
-
                 "price_local": price_local,
                 "currency": "AWG",
-
                 "price_usd": price_usd,
-
                 "weight_kg": weight_kg,
-
-                "price_per_kg_usd": (
-                    price_per_kg_usd
-                ),
-
+                "price_per_kg_usd": price_per_kg_usd,
                 "product_url": source_url,
                 "source_url": source_url,
             }
@@ -913,11 +667,7 @@ def parse_products_from_html(
     return products
 
 
-def scrape_search(
-    driver,
-    category,
-    term,
-):
+def scrape_search(driver, category, term):
 
     url = build_search_url(term)
 
@@ -1084,11 +834,7 @@ def export_lmstudio(df):
                 + "\n"
             )
 
-    return (
-        csv_path,
-        txt_path,
-        jsonl_path
-    )
+    return csv_path, txt_path, jsonl_path
 
 
 def main():
@@ -1161,19 +907,6 @@ def main():
 
     lm_csv, lm_txt, lm_jsonl = export_lmstudio(df)
 
-    df.to_csv(
-        output_file,
-        index=False,
-        encoding="utf-8-sig"
-    )
-
-    df.to_csv(
-        latest_file,
-        index=False,
-        encoding="utf-8-sig"
-    )
-    lm_csv, lm_txt, lm_jsonl = export_lmstudio(df)
-
     print("\n===================================")
     print(" SUPER FOOD ARUBA FINISHED")
     print("===================================")
@@ -1184,6 +917,7 @@ def main():
     print(f"LM TXT: {lm_txt}")
     print(f"LM JSONL: {lm_jsonl}")
     print(f"CSV latest: {latest_file}")
+
 
 if __name__ == "__main__":
     main()

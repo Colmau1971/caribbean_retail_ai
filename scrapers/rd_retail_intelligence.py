@@ -9,10 +9,19 @@ from selenium.common.exceptions import (
     NoSuchElementException
 )
 
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
+
+from brand_dictionary import infer_brand
+
 import pandas as pd
 import re
 import time
-from pathlib import Path
 
 # =====================================================
 # CONFIGURACIÓN MONEDA
@@ -342,23 +351,22 @@ def nombre_desde_url(url):
     return slug.replace("-", " ").title()
 
 
-def detectar_marca(nombre):
+# def detectar_marca(nombre):
 
-    marcas_ordenadas = sorted(
-        MARCAS,
-        key=len,
-        reverse=True
-    )
+#    marcas_ordenadas = sorted(
+#        MARCAS,
+#        key=len,
+#        reverse=True
+#    )
 
-    for marca in marcas_ordenadas:
+#    for marca in marcas_ordenadas:
 
-        if re.search(
-            rf"\b{re.escape(marca.lower())}\b",
-            nombre.lower()
-        ):
-            return marca
-
-    return "Other"
+ #       if re.search(
+ #           rf"\b{re.escape(marca.lower())}\b",
+ #           nombre.lower()
+ #       ):
+ #           return marca
+#  return "Other"
 
 
 def es_categoria(nombre, keywords):
@@ -772,6 +780,12 @@ for categoria, terms in SEARCH_TERMS.items():
     
                 pres = presentacion(nombre)
 
+                STOP_WORDS = [
+                    "Alternativas del supermercado",
+                    "Productos relacionados",
+                    "Historial de precios"
+                ]
+
                 lineas = []
 
                 for x in texto.splitlines():
@@ -781,14 +795,8 @@ for categoria, terms in SEARCH_TERMS.items():
                     if not x:
                         continue
 
-                STOP_WORDS = [
-                    "Alternativas del supermercado",
-                    "Productos relacionados",
-                    "Historial de precios"
-                ]
-
-                if any(stop in x for stop in STOP_WORDS):
-                    break
+                    if any(stop in x for stop in STOP_WORDS):
+                        break
 
                     lineas.append(x)
 
@@ -800,13 +808,13 @@ for categoria, terms in SEARCH_TERMS.items():
                 pres = extract_best_presentation(lineas)
 
                 if not es_categoria(nombre, terms) or es_exclusion(nombre):
-    
+
                     print("NO ES CATEGORIA:", nombre)
-    
+
                     continue
     
-                marca = detectar_marca(nombre)
-
+                marca = infer_brand(nombre)
+                
                 tipo = clasificar(
                     nombre,
                     categoria

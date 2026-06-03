@@ -6,16 +6,23 @@ Uso:
 python scrapers/doit_aruba_intelligence.py
 """
 
+
 import re
 import time
-from datetime import datetime
-from pathlib import Path
-from urllib.parse import urljoin
-
-import pandas as pd
 import requests
-from bs4 import BeautifulSoup
+import pandas as pd
+import sys
 
+from bs4 import BeautifulSoup
+from pathlib import Path
+from datetime import datetime
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
+
+from brand_dictionary import infer_brand
 
 # =========================================================
 # CONFIG
