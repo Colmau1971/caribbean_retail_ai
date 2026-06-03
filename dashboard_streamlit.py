@@ -177,12 +177,18 @@ total_categories = filtered["standard_category"].nunique()
 avg_price_kg = filtered["price_per_kg_usd"].median()
 
 barcode_coverage = (
-    filtered["barcode_harmonized"].notna().mean() * 100
-    if "barcode_harmonized" in filtered.columns
-    else filtered["barcode"].notna().mean() * 100
-    if "barcode" in filtered.columns
-    else np.nan
-)
+    (
+        filtered["barcode"].notna()
+        if "barcode" in filtered.columns
+        else False
+    )
+    |
+    (
+        filtered["barcode_harmonized"].notna()
+        if "barcode_harmonized" in filtered.columns
+        else False
+    )
+).mean() * 100
 
 weight_coverage = (
     filtered["weight_kg"].notna().mean() * 100
@@ -274,6 +280,111 @@ with col2:
         st.plotly_chart(fig, width="stretch")
     else:
         st.info("No hay datos suficientes de marcas.")
+# ==============================
+# EXECUTIVE SUMMARY
+# ==============================
+
+st.subheader("📌 Executive Summary")
+
+exec1, exec2, exec3, exec4 = st.columns(4)
+
+# País con más registros
+country_records = (
+    filtered.groupby("country")
+    .size()
+    .sort_values(ascending=False)
+)
+
+if not country_records.empty:
+    exec1.metric(
+        "Mayor surtido",
+        country_records.index[0],
+        f"{country_records.iloc[0]:,.0f} SKUs"
+    )
+
+# País más caro
+price_country = (
+    filtered
+    .dropna(subset=["price_per_kg_usd"])
+    .groupby("country")["price_per_kg_usd"]
+    .median()
+    .sort_values(ascending=False)
+)
+
+if not price_country.empty:
+
+    exec2.metric(
+        "País más caro",
+        price_country.index[0],
+        f"${price_country.iloc[0]:.2f}/kg"
+    )
+
+    exec3.metric(
+        "País más económico",
+        price_country.index[-1],
+        f"${price_country.iloc[-1]:.2f}/kg"
+    )
+
+# Marcas reales
+
+invalid_brand_labels = {
+    "Other",
+    "Unknown",
+    "N/A",
+    "De",
+    "La",
+    "El"
+}
+
+real_brands = (
+    filtered[
+        ~filtered["brand"]
+        .astype(str)
+        .isin(invalid_brand_labels)
+    ]["brand"]
+    .nunique()
+)
+
+exec4.metric(
+    "Marcas identificadas",
+    f"{real_brands:,.0f}"
+)
+
+st.markdown("### Resumen por país")
+
+country_summary = (
+    filtered
+    .groupby("country", as_index=False)
+    .agg(
+        records=("product_name", "count"),
+        products=("product_name", "nunique"),
+        brands=("brand", "nunique"),
+        median_price_kg_usd=(
+            "price_per_kg_usd",
+            "median"
+        )
+    )
+    .sort_values(
+        "records",
+        ascending=False
+    )
+)
+
+country_summary.columns = [
+    "Country",
+    "Records",
+    "Unique Products",
+    "Brands",
+    "Median USD/kg"
+]
+
+st.dataframe(
+    country_summary,
+    width="stretch",
+    hide_index=True
+)
+
+st.divider()
 
 # ==============================
 # OPPORTUNITY ENGINE
