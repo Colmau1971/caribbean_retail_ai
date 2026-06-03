@@ -485,12 +485,14 @@ def parse_product_cards(
 
         product_name = safe_get_text(name_el)
         price_text = safe_get_text(price_el)
-
         product_url = (
             normalize_url(link_el.get("href"), base_url)
             if link_el else None
         )
-
+        product_detail_text = container.get_text(
+            " ",
+            strip=True
+        )
         image_url = (
             normalize_url(image_el.get("src"), base_url)
             if image_el else None
@@ -532,6 +534,7 @@ def parse_product_cards(
             "retailer": retailer,
             "source_category": source_category,
             "search_term": search_term,
+            "product_detail_text": product_detail_text,
             "product_name": product_name,
             "barcode": barcode,
             "barcode_length": (
@@ -684,6 +687,12 @@ def extract_weight_kg(product_name: str):
 
     text = product_name.lower().replace(",", ".")
 
+    text = re.sub(
+        r"\d+(?:\.\d+)?\s*[″\"]",
+        " ",
+        text
+    )
+
     multi = re.search(
         r"(\d+)\s*[x×]\s*"
         r"([0-9]+(?:\.[0-9]+)?)\s*"
@@ -784,7 +793,13 @@ def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     df["brand"] = df["product_name"].apply(infer_brand)
 
-    df["weight_kg"] = df["product_name"].apply(
+    df["weight_source_text"] = (
+        df["product_name"].fillna("")
+        + " "
+        + df["product_detail_text"].fillna("")
+    )
+
+    df["weight_kg"] = df["weight_source_text"].apply(
         extract_weight_kg
     )
 

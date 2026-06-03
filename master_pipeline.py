@@ -1245,38 +1245,14 @@ def build_regional_dataset():
     # REMOVE "OTHER" BRANDS
     # ==========================================
 
-    regional_df = regional_df[
-        regional_df["brand"]
-        .astype(str)
-        .str.strip()
-        .str.lower()
-        != "other"
-    ]
+      # Mantener productos con marca Other para no perder SKUs
+    regional_df["brand"] = regional_df["brand"].fillna("Unknown")
 
-    print('Removed brand "Other".')
+    print('Brand "Other" retained to preserve SKUs.')
     
-   
     regional_df.columns = [
         str(c).strip().lower()
         for c in regional_df.columns
-    ]
-
-    regional_df = regional_df.replace(
-        [
-            "nan",
-            "NaN",
-            "None",
-            "none",
-            "NULL",
-            "null",
-            ""
-        ],
-        pd.NA
-    )
-
-    regional_df = regional_df.loc[
-        :,
-        ~regional_df.columns.duplicated()
     ]
 
     # ==================================================
