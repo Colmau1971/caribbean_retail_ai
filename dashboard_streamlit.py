@@ -159,36 +159,59 @@ if brand_groups:
 # ==============================
 
 total_records = len(filtered)
+unique_products = filtered["product_name"].nunique()
 
 if "family_key" in filtered.columns:
-    unique_skus = filtered["family_key"].nunique()
+    matched_families = filtered["family_key"].nunique()
 elif "match_key" in filtered.columns:
-    unique_skus = filtered["match_key"].nunique()
+    matched_families = filtered["match_key"].nunique()
 elif "barcode_harmonized" in filtered.columns:
-    unique_skus = filtered["barcode_harmonized"].nunique()
+    matched_families = filtered["barcode_harmonized"].nunique()
 elif "barcode" in filtered.columns:
-    unique_skus = filtered["barcode"].nunique()
+    matched_families = filtered["barcode"].nunique()
 else:
-    unique_skus = filtered["product_name"].nunique()
+    matched_families = unique_products
 
 total_countries = filtered["country"].nunique()
 total_categories = filtered["standard_category"].nunique()
-
 avg_price_kg = filtered["price_per_kg_usd"].median()
 
-kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
+barcode_coverage = (
+    filtered["barcode_harmonized"].notna().mean() * 100
+    if "barcode_harmonized" in filtered.columns
+    else filtered["barcode"].notna().mean() * 100
+    if "barcode" in filtered.columns
+    else np.nan
+)
+
+weight_coverage = (
+    filtered["weight_kg"].notna().mean() * 100
+    if "weight_kg" in filtered.columns
+    else np.nan
+)
+
+kpi1, kpi2, kpi3, kpi4 = st.columns(4)
 
 kpi1.metric("Total Records", f"{total_records:,.0f}")
-kpi2.metric("Unique SKUs", f"{unique_skus:,.0f}")
-kpi3.metric("Países", f"{total_countries}")
-kpi4.metric("Categorías", f"{total_categories}")
-kpi5.metric(
-    "Precio prom. USD/kg",
+kpi2.metric("Unique Products", f"{unique_products:,.0f}")
+kpi3.metric("Matched Families", f"{matched_families:,.0f}")
+kpi4.metric(
+    "Precio mediano USD/kg",
     f"${avg_price_kg:,.2f}" if pd.notna(avg_price_kg) else "N/A"
 )
 
-st.divider()
+kpi5, kpi6, kpi7, kpi8 = st.columns(4)
 
+kpi5.metric("Países", f"{total_countries}")
+kpi6.metric("Categorías", f"{total_categories}")
+kpi7.metric(
+    "Barcode Coverage",
+    f"{barcode_coverage:,.1f}%" if pd.notna(barcode_coverage) else "N/A"
+)
+kpi8.metric(
+    "Weight Coverage",
+    f"{weight_coverage:,.1f}%" if pd.notna(weight_coverage) else "N/A"
+)
 # ==============================
 # PRICE INTELLIGENCE
 # ==============================
@@ -218,13 +241,27 @@ with col1:
         st.info("No hay datos suficientes de USD/kg para esta vista.")
 
 with col2:
+    invalid_brand_labels = {
+        "Other", "Unknown", "N/A",
+        "De", "La", "El", "Lu",
+        "Pan", "Galleta", "Galletas",
+        "Cookie", "Cookies",
+        "Cracker", "Crackers",
+        "Snack", "Snacks"
+    }
+
+    brand_base = filtered[
+        ~filtered["brand"].astype(str).isin(
+            invalid_brand_labels
+        )
+    ]
+
     top_brands = (
-        filtered.groupby("brand", as_index=False)
+        brand_base.groupby("brand", as_index=False)
         .agg(skus=("brand", "count"))
         .sort_values("skus", ascending=False)
         .head(15)
     )
-
     if not top_brands.empty:
         fig = px.bar(
             top_brands,
@@ -621,7 +658,28 @@ if match_col:
             "price_gap_pct",
             ascending=False
         )
+        same1, same2, same3 = st.columns(3)
 
+        same1.metric(
+            "Shared SKU Families",
+            f"{len(sku_cross):,.0f}"
+        )
+
+        same2.metric(
+            "Median Price Gap",
+            (
+                f"{sku_cross['price_gap_pct'].median():,.1f}%"
+                if pd.notna(
+                    sku_cross["price_gap_pct"].median()
+                )
+                else "N/A"
+            )
+        )
+
+        same3.metric(
+            "Max Countries / SKU",
+            f"{sku_cross['countries'].max():,.0f}"
+        )
         col5, col6 = st.columns(2)
 
         with col5:
