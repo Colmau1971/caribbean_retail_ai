@@ -129,6 +129,58 @@ def extract_weight_kg(text):
 
     return np.nan
 
+def extract_unit_count(text):
+
+    if pd.isna(text):
+        return np.nan
+
+    text = str(text).lower()
+
+    patterns = [
+        r"(\d+)\s?(und|unidad|unidades)",
+        r"(\d+)\s?(ct|count)",
+        r"(\d+)\s?(pack|paq)",
+        r"pack\s?of\s?(\d+)",
+    ]
+
+    for pattern in patterns:
+
+        match = re.search(
+            pattern,
+            text
+        )
+
+        if match:
+
+            try:
+                return int(
+                    match.group(1)
+                )
+            except:
+                pass
+
+    return np.nan
+
+
+def unit_bucket(x):
+
+    try:
+        x = int(x)
+
+    except Exception:
+        return "single"
+
+    if x <= 2:
+        return "single"
+
+    elif x <= 8:
+        return "smallpack"
+
+    elif x <= 20:
+        return "multipack"
+
+    return "bulkpack"
+
 
 def clean_brand(x):
 
@@ -139,6 +191,24 @@ def clean_brand(x):
 
     return str(x).strip().title()
 
+def normalize_barcode_12(x):
+    if pd.isna(x):
+        return pd.NA
+
+    x = str(x).strip().replace(".0", "")
+    x = "".join(c for c in x if c.isdigit())
+
+    if len(x) == 13:
+        x = x[:12]
+    elif len(x) != 12:
+        return pd.NA
+
+    bad_prefixes = ("210000", "205000", "151515", "999999")
+
+    if x.startswith(bad_prefixes):
+        return pd.NA
+
+    return x
 
 def infer_brand(row):
 
@@ -685,6 +755,7 @@ def safe_load_csv(path, country):
                 "gtin"
             ]
         )
+
         # Ensure required columns exist
         required_cols = [
             "category",
@@ -696,6 +767,7 @@ def safe_load_csv(path, country):
             "price_usd",
             "price_per_kg_usd",
             "weight_kg",
+            "unit_count",
             "barcode",
             "barcode_length",
         ]
@@ -706,8 +778,8 @@ def safe_load_csv(path, country):
 
         if "country" not in df.columns:
             df["country"] = country
-            
-       # =========================
+
+        # =========================
         # CLEAN PRODUCT NAME
         # =========================
 
@@ -717,7 +789,7 @@ def safe_load_csv(path, country):
                 x["brand"]
             ),
             axis=1
-        )    
+        )
 
         # =========================
         # CLEAN TEXT
@@ -759,9 +831,6 @@ def safe_load_csv(path, country):
         # WEIGHT
         # =========================
 
-        if "weight_kg" not in df.columns:
-            df["weight_kg"] = np.nan
-
         df["weight_kg"] = pd.to_numeric(
             df["weight_kg"],
             errors="coerce"
@@ -781,6 +850,23 @@ def safe_load_csv(path, country):
             df["weight_kg"]
             .fillna(inferred_weight)
             .fillna(inferred_weight_2)
+        )
+
+        # =========================
+        # UNIT COUNT
+        # =========================
+
+        df["unit_count"] = (
+            df["product_name"]
+            .apply(extract_unit_count)
+        )
+
+        df["unit_count"] = (
+            df["unit_count"]
+            .fillna(
+                df["presentation"]
+                .apply(extract_unit_count)
+            )
         )
 
         # =========================
@@ -1197,9 +1283,15 @@ def build_regional_dataset():
     # BARCODE HARMONIZATION
     # ==================================================
 
-    regional_df["barcode_harmonized"] = (
+    regional_df["barcode_raw"] = regional_df["barcode"]
+
+    regional_df["barcode_12"] = (
         regional_df["barcode"]
-        .apply(harmonize_barcode)
+        .apply(normalize_barcode_12)
+    )
+
+    regional_df["barcode_harmonized"] = (
+        regional_df["barcode_12"]
     )
 
     # ==================================================
@@ -1282,14 +1374,15 @@ def build_regional_dataset():
         .astype("string")
         .fillna("unknown")
     )
-    
+    regional_df["unit_bucket"] = (
+        regional_df["unit_count"]
+        .apply(unit_bucket)
+    )
     # ==================================================
     # MATCH KEY
     # ==================================================
     
-    regional_df["match_key"] = np.where(
-        regional_df["barcode_harmonized"].notna(),
-        regional_df["barcode_harmonized"],
+    regional_df["match_key"] = (
         regional_df["sku_text_key"]
         + "_"
         + regional_df["weight_bucket"]
@@ -1318,10 +1411,7 @@ def build_regional_dataset():
     # REGIONAL OVERLAP
     # ==================================================
     
-    regional_df["regional_overlap"] = (
-        regional_df.groupby("match_key")["country"]
-        .transform("nunique")
-    )
+
     print("\nTop Match Keys")
 
     print(
@@ -1343,32 +1433,42 @@ def build_regional_dataset():
        # ==================================================
     # FAMILY KEY - FUZZY COMMERCIAL MATCH
     # ==================================================
-
     def family_key(row):
 
-        brand = normalize_sku_text(row.get("brand", ""))
-        name = normalize_sku_text(row.get("product_name", ""))
+        brand = normalize_sku_text(
+            row.get("brand", "")
+        )
 
-        tokens = name.split()
+        name = normalize_sku_text(
+            row.get("product_name", "")
+        )
 
-        important_tokens = [
-            t for t in tokens
-            if len(t) >= 4
-        ][:3]
+        stopwords = {
+            "galleta", "galletas", "cookie", "cookies",
+            "cracker", "crackers", "sabor", "original",
+            "sandwich", "rellena", "relleno", "crema",
+            "pack", "paq", "mini", "regular", "classic",
+            "clasica", "clasico", "with", "and", "the",
+            "de", "con", "para", "und", "unidad",
+            "unidades"
+        }
 
-        weight = row.get("weight_kg")
+        tokens = [
+            t
+            for t in name.split()
+            if len(t) >= 4 and t not in stopwords
+        ]
 
-        if pd.notna(weight):
-            weight_key = str(round(weight * 1000))
-        else:
-            weight_key = "unknown"
+        tokens = sorted(set(tokens))
+
+        key_tokens = "_".join(
+            tokens[:4]
+        )
 
         return (
             brand
             + "_"
-            + "_".join(important_tokens)
-            + "_"
-            + weight_key
+            + key_tokens
         )
 
     regional_df["family_key"] = regional_df.apply(
@@ -1381,13 +1481,18 @@ def build_regional_dataset():
         .transform("nunique")
     )
 
+    regional_df["regional_overlap"] = (
+        regional_df.groupby("family_key")["country"]
+        .transform("nunique")
+    )
+
     print("\nCommercial Overlap")
 
     print(
         regional_df["commercial_overlap"]
         .value_counts()
         .sort_index()
-    )  
+    )
     # ==================================================
     # SAME SKU PRICE GAP
     # ==================================================
