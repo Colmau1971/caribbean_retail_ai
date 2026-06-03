@@ -221,7 +221,10 @@ def infer_brand(row):
         "8", '8"', "10", "12", "24", "36",
         "sale", "price", "remove", "from", "list",
         "items", "filters", "per", "page",
-        "unknown", "nan", "none","other","unknown"
+        "unknown", "nan", "none","other","unknown","galleta",
+        "galletas", "pan","cookies","cookie","cracker",
+        "crackers","bakery","snack","snacks","tortilla",
+        "tortillas"
     ]
 
     if pd.notna(brand):
