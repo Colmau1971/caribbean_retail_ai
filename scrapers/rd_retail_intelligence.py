@@ -365,7 +365,14 @@ def es_categoria(nombre, keywords):
 
     n = nombre.lower()
 
-    return any(k in n for k in keywords)
+    for k in keywords:
+
+        pattern = r"\b" + re.escape(k.lower()) + r"s?\b"
+
+        if re.search(pattern, n):
+            return True
+
+    return False
 
 
 def presentacion(texto):
@@ -387,6 +394,44 @@ def presentacion(texto):
 
     return "-"
 
+
+def extract_best_presentation(lineas):  
+
+    peso = None
+    unidades = None
+
+    for linea in lineas:
+
+        p = presentacion(linea)
+
+        if p == "-":
+            continue
+
+        p_upper = p.upper()
+
+        if (
+            "GR" in p_upper
+            or "KG" in p_upper
+            or "OZ" in p_upper
+            or "LB" in p_upper
+        ):
+            if peso is None:
+                peso = p
+
+        elif (
+            "UND" in p_upper
+            or "UNIDADES" in p_upper
+        ):
+            if unidades is None:
+                unidades = p
+
+    if peso:
+        return peso
+
+    if unidades:
+        return unidades
+
+    return "-"
 
 def extract_weight_kg(pres):
 
@@ -522,6 +567,8 @@ def es_exclusion(nombre):
         "arroz",
         "aceite",
         "detergente",
+        "pita chips",
+        "chips de pita",
     ]
 
     return any(x in n for x in exclusiones)
@@ -724,21 +771,34 @@ for categoria, terms in SEARCH_TERMS.items():
                     nombre = nombre_desde_url(link)
     
                 pres = presentacion(nombre)
-    
-                lineas = [
-                    x.strip()
-                    for x in texto.splitlines()
-                    if x.strip()
+
+                lineas = []
+
+                for x in texto.splitlines():
+
+                    x = x.strip()
+
+                    if not x:
+                        continue
+
+                STOP_WORDS = [
+                    "Alternativas del supermercado",
+                    "Productos relacionados",
+                    "Historial de precios"
                 ]
-    
-                for linea in lineas:
-    
-                    p = presentacion(linea)
-    
-                    if p != "-":
-                        pres = p
-                        break
-    
+
+                if any(stop in x for stop in STOP_WORDS):
+                    break
+
+                    lineas.append(x)
+
+                print("\nLINEAS ENCONTRADAS:")
+
+                for l in lineas[:30]:
+                    print(l)
+
+                pres = extract_best_presentation(lineas)
+
                 if not es_categoria(nombre, terms) or es_exclusion(nombre):
     
                     print("NO ES CATEGORIA:", nombre)
@@ -746,7 +806,7 @@ for categoria, terms in SEARCH_TERMS.items():
                     continue
     
                 marca = detectar_marca(nombre)
-    
+
                 tipo = clasificar(
                     nombre,
                     categoria
