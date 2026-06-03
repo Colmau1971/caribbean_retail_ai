@@ -12,6 +12,8 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
+from brand_dictionary import infer_brand as infer_brand_from_dictionary
+
 FORCE_SCRAPE = False
 # ======================================================
 # PATHS
@@ -219,7 +221,7 @@ def infer_brand(row):
         "8", '8"', "10", "12", "24", "36",
         "sale", "price", "remove", "from", "list",
         "items", "filters", "per", "page",
-        "unknown", "nan", "none"
+        "unknown", "nan", "none","other","unknown"
     ]
 
     if pd.notna(brand):
@@ -236,6 +238,11 @@ def infer_brand(row):
 
     if pd.isna(product):
         return "Unknown"
+    
+    dictionary_brand = infer_brand_from_dictionary(product)
+
+    if dictionary_brand and str(dictionary_brand).lower() not in ["other", "unknown"]:
+        return dictionary_brand
 
     words = str(product).split()
 
