@@ -1677,6 +1677,12 @@ def export_regional_files(
         )
 
     df.to_csv(
+        regional_csv,
+        index=False,
+        encoding="utf-8-sig"
+    )
+
+    df.to_csv(
         regional_latest_csv,
         index=False,
         encoding="utf-8-sig"
