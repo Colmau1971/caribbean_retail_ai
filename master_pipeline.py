@@ -224,7 +224,10 @@ def infer_brand(row):
         "unknown", "nan", "none","other","unknown","galleta",
         "galletas", "pan","cookies","cookie","cracker",
         "crackers","bakery","snack","snacks","tortilla",
-        "tortillas","de", "lu", "la"
+        "tortillas","de", "lu", "la","Bizcocho","cake","cupcake",
+        "brownie","muffin","wrap","pan","wraps","tortilla",
+        "tortillas","chips","snack","snacks","popcorn","mezcla",
+        "ct","pc","ml","rm","st","ea","pk","bg","lb","oz","kg"
     ]
 
     if pd.notna(brand):
@@ -247,20 +250,7 @@ def infer_brand(row):
     if dictionary_brand and str(dictionary_brand).lower() not in ["other", "unknown"]:
         return dictionary_brand
 
-    words = str(product).split()
-
-    for w in words:
-        candidate = w.strip().title()
-        c = candidate.lower()
-
-        if (
-            c not in invalid_brands
-            and not re.match(r"^[0-9/\"'\-]+s?$", c)
-            and len(c) > 1
-        ):
-            return candidate
-
-    return "Unknown"
+    return "Unknown"   
 
 def detect_segment(name):
 
@@ -1451,11 +1441,13 @@ def build_regional_dataset():
             tokens[:4]
         )
 
-        return (
-            brand
-            + "_"
-            + key_tokens
-        )
+        if not key_tokens:
+            key_tokens = "unknown"
+
+        if not brand:
+            brand = "unknown"
+
+        return f"{brand}_{key_tokens}"
 
     regional_df["family_key"] = regional_df.apply(
         family_key,
