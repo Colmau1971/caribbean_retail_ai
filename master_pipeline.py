@@ -1119,7 +1119,7 @@ def build_regional_dataset():
             "mcvitie": "McVitie's",
             "mcvities": "McVitie's",
             "reynolds": "Reynolds",
-            "glad": "Glad",
+            "glad": "Glad"
         }
 
         return BRAND_GROUPS.get(
@@ -1133,7 +1133,7 @@ def build_regional_dataset():
     )
 
     print("Brand groups normalized.")
-    # ==========================================
+       # ==========================================
     # BRAND NORMALIZATION ENGINE
     # Missing brands backlog
     # ==========================================
@@ -1150,6 +1150,19 @@ def build_regional_dataset():
 
         if not missing_brands.empty:
 
+            missing_brands["dictionary_brand"] = (
+                missing_brands["product_name"]
+                .apply(infer_brand_from_dictionary)
+            )
+
+            missing_brands = missing_brands[
+                missing_brands["dictionary_brand"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .eq("other")
+            ]
+
             missing_brands["possible_brand"] = (
                 missing_brands["product_name"]
                 .astype(str)
@@ -1158,34 +1171,23 @@ def build_regional_dataset():
                 .str[0]
                 .str.title()
             )
-            
+
             GENERIC_BRANDS = {
-                "Other",
-                "Pan",
-                "Bread",
-                "Bakery",
-                "Frozen",
-                "Galleta",
-                "Galletas",
-                "Cookie",
-                "Cookies",
-                "Cracker",
-                "Crackers",
-                "Wafer",
-                "Bizcocho",
-                "Cake",
-                "Cupcake",
-                "Brownie",
-                "Muffin",
-                "Pita",
-                "Wrap",
-                "Wraps",
-                "Tortilla",
-                "Tortillas",
-                "Chips",
-                "Snack",
-                "Snacks",
-                "Mezcla",
+                "Other", "Unknown",
+                "Pan", "Bread", "Bakery", "Frozen",
+                "Galleta", "Galletas", "Cookie", "Cookies",
+                "Cracker", "Crackers", "Wafer",
+                "Bizcocho", "Cake", "Cupcake", "Brownie",
+                "Muffin", "Muffins", "Mini",
+                "Pita", "Wrap", "Wraps",
+                "Tortilla", "Tortillas",
+                "Chips", "Snack", "Snacks",
+                "Mezcla", "Barra", "Helado", "Helados",
+                "Croissant", "Flatbread", "Viga",
+                "Sweet", "Grocery", "Wrapping",
+                "Molde", "Capacillos", "Leche",
+                "Paleta", "Milk", "Meat", "Soft",
+                "Each", "Flavoured", "Plastico",
             }
 
             missing_summary = (
@@ -1240,35 +1242,6 @@ def build_regional_dataset():
     except Exception as e:
 
         print(f"Brand normalization engine error: {e}")
-        
-    # ==========================================
-    # REMOVE "OTHER" BRANDS
-    # ==========================================
-
-      # Mantener productos con marca Other para no perder SKUs
-    regional_df["brand"] = regional_df["brand"].fillna("Unknown")
-
-    print('Brand "Other" retained to preserve SKUs.')
-    
-    regional_df.columns = [
-        str(c).strip().lower()
-        for c in regional_df.columns
-    ]
-
-    # ==================================================
-    # BARCODE HARMONIZATION
-    # ==================================================
-
-    regional_df["barcode_raw"] = regional_df["barcode"]
-
-    regional_df["barcode_12"] = (
-        regional_df["barcode"]
-        .apply(normalize_barcode_12)
-    )
-
-    regional_df["barcode_harmonized"] = (
-        regional_df["barcode_12"]
-    )
 
     # ==================================================
     # SKU TEXT NORMALIZATION
@@ -1372,6 +1345,25 @@ def build_regional_dataset():
             + "_unknown"
         )
     )
+
+    # ==================================================
+    # BARCODE HARMONIZATION
+    # ==================================================
+
+    if "barcode" not in regional_df.columns:
+        regional_df["barcode"] = pd.NA
+
+    regional_df["barcode_raw"] = regional_df["barcode"]
+
+    regional_df["barcode_12"] = (
+        regional_df["barcode"]
+        .apply(normalize_barcode_12)
+    )
+
+    regional_df["barcode_harmonized"] = (
+        regional_df["barcode_12"]
+    )
+    
     # ==================================================
     # FAMILY MATCHING ENGINE
     # Commercial engine is calculated below
@@ -1642,7 +1634,7 @@ def export_regional_files(
 
     with pd.ExcelWriter(
         regional_latest_excel,
-        engine="openpyxl"
+        engine="xlsxwriter"
     ) as writer:
 
         df.to_excel(

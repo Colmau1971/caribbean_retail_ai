@@ -277,7 +277,27 @@ BRAND_KEYWORDS = {
     "bergen": "Bergen",
 
     # Snacks / cookies
-    "qiin": "Qiin"
+    "qiin": "Qiin",
+
+
+    "odorex": "Odorex",
+    "elina": "Elina",
+    "roomboter": "Roomboter",
+    "liga": "Liga",
+    "motto": "Motto",
+    "odorex": "Odorex",
+    "nutella": "Nutella",
+    "kinder": "Kinder",
+    "twix": "Twix",
+    "toblerone": "Toblerone",
+    "santitas": "Santitas",
+    "dove": "Dove",
+    "kraft": "Kraft",
+    "becky's": "Becky's",
+    "chiefeez": "Chiefeez",
+    "shoon": "Shoon",
+    "taste setter": "Taste Setter"
+
     }
 
 
@@ -285,6 +305,7 @@ def infer_brand(name):
 
     if not name:
         return "Other"
+
 
     name_clean = (
         str(name)
