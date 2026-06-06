@@ -231,7 +231,53 @@ BRAND_KEYWORDS = {
     "stiratini": "Stiratini",
     "soldanza": "Soldanza",
     "pizkas": "Pizkas",
-    "la dulcerita": "La Dulcerita"
+    "la dulcerita": "La Dulcerita",
+    "bisco": "Bisco",
+    "biscopan": "Bisco",
+    "bisco pan": "Bisco",
+    "milka": "Milka",
+    "carrefour": "Carrefour",
+    "can can": "Can Can",
+    "cancan": "Can Can",
+    "jumbo": "Jumbo",
+    "betty crocker": "Betty Crocker",
+    "eggo": "Eggo",
+    "bisco": "Bisco",
+    "bravo": "Bravo",
+    "crav'n": "Crav'N",
+    "cravn": "Crav'N",
+    "dulcesol": "Dulcesol",
+
+    "chobani": "Chobani",
+    "wheat thins": "Wheat Thins",
+    "yasso": "Yasso",
+    "bigelow": "Bigelow",
+    "digiorno": "DiGiorno",
+    "hipro": "HiPro",
+    "stouffer's": "Stouffer's",
+    "stouffers": "Stouffer's",
+    "buen horno": "Buenhorno",
+    # Snacks
+    "frito lay": "Frito-Lay",
+    "fritolay": "Frito-Lay",
+
+    # Private label / retail brands
+    "cravn": "Crav'N",
+    "crav'n": "Crav'N",
+
+    "lider": "Líder",
+
+    # Cookies / protein snacks
+    "lenny & larry": "Lenny & Larry's",
+    "lenny and larry": "Lenny & Larry's",
+    "lenny y larry": "Lenny & Larry's",
+    "lenny larry": "Lenny & Larry's",
+
+    # Bakery / crackers
+    "bergen": "Bergen",
+
+    # Snacks / cookies
+    "qiin": "Qiin"
     }
 
 
