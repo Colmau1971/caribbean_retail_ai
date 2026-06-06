@@ -114,7 +114,6 @@ BRAND_KEYWORDS = {
     "PLANTERS": "Planters",
     "PILLSBURY": "Pillsbury",
     "TOPPERS": "Toppers",
-    "BRAVO": "Bravo",
 
     "CUETARA": "Cuetara",
     "QIIN": "Qiin",
@@ -145,8 +144,7 @@ BRAND_KEYWORDS = {
     "NUTELLA": "Nutella",
     "MAMUT": "Mamut",
     "CHOCORAMO": "Chocoramo",
-    "BEN & JERRY": "Ben & Jerry's",
-    "BRAVO": "Bravo",
+    "BEN & JERRY": "Ben & Jerry's", 
     "NOEL": "Noel",
     "CUETARA": "Cuetara",
     "DULCESOL": "Dulcesol",
@@ -217,7 +215,23 @@ BRAND_KEYWORDS = {
     "maliyahs": "Maliyahs",
     "hol foods": "HOL Foods",
     "rtc": "RTC",
-    "members selection": "Member's Selection"
+    "members selection": "Member's Selection",
+    "cuetara": "Cuetara",
+    "cuétara": "Cuetara",
+    "badia": "Badia",
+    "pirulin": "Pirulin",
+    "pirucream": "Pirucream",
+    "Bisco": "Bisco",
+    "Wala": "Wala",
+    "Pepin": "Pepin",
+    "Bolin": "Bolin",
+    "stonefire": "Stonefire",
+    "verkade": "Verkade",
+    "toppers": "Toppers",
+    "stiratini": "Stiratini",
+    "soldanza": "Soldanza",
+    "pizkas": "Pizkas",
+    "la dulcerita": "La Dulcerita"
     }
 
 

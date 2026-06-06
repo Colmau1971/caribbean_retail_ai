@@ -389,7 +389,10 @@ def clean_product_name(text):
 
     brand = infer_brand(core)
 
-    final = f"{brand} | {core}"
+    if brand and brand.lower() not in ["other", "unknown"]:
+        final = f"{brand} | {core}"
+    else:
+        final = core
 
     if weight:
         final += f" | {weight}"
