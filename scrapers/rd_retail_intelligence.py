@@ -556,7 +556,13 @@ def retailer_desde_href(href):
 
     if "plazalama" in h or "plaza-lama" in h:
         return "Plaza Lama"
-
+    
+    if "pricesmart" in h:
+        return "PriceSmart"
+    
+    if "carrefour" in h:
+        return "Carrefour"
+    
     if "garrido" in h:
         return "Garrido"
 
