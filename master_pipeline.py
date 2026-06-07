@@ -498,6 +498,138 @@ def standardize_category(value):
         return "Snacks"
 
     return str(value).title()
+def classify_commercial_category(row):
+
+    name = str(row.get("product_name", "")).lower()
+    category = str(row.get("standard_category", "")).lower()
+    family = str(row.get("commercial_family_key", "")).lower()
+
+    text = f"{name} {category} {family}"
+
+    if any(k in text for k in [
+        "tortilla", "tortillas", "wrap", "wraps",
+        "burrito", "taco", "tex mex", "old el paso"
+    ]):
+        return "TORTILLAS_WRAPS"
+
+    if any(k in text for k in [
+        "pita", "flatbread", "naan", "lavash"
+    ]):
+        return "PITA_FLATBREAD"
+
+    if any(k in text for k in [
+        "toast", "tostada", "tostadas", "pan tostado",
+        "melba"
+    ]):
+        return "TOASTED_BREAD"
+
+    if any(k in text for k in [
+        "bagel", "bagels"
+    ]):
+        return "BAGELS"
+
+    if any(k in text for k in [
+        "hamburguesa", "hamburger", "burger buns",
+        "hamburger_buns"
+    ]):
+        return "HAMBURGER_BUNS"
+
+    if any(k in text for k in [
+        "hot dog", "hotdog", "frank bun", "hotdog_buns"
+    ]):
+        return "HOTDOG_BUNS"
+    # =========================
+    # CRACKERS / SAVORY COOKIES
+    # Must go before "integral" bread rules
+    # =========================
+
+    if any(k in text for k in [
+        "club social",
+        "soda_cracker",
+        "saltina_cracker",
+        "galleta de soda",
+        "galletas de soda",
+        "soda integral",
+        "saltina",
+        "saladitas",
+        "cracker",
+        "crackers",
+        "ritz",
+    ]):
+        return "SAVORY_CRACKERS"
+        # =========================
+    # SWEET COOKIES
+    # Must go before "integral" bread rules
+    # =========================
+
+    if any(k in text for k in [
+        "galleta integral",
+        "galletas integrales",
+        "bisco pan galleta",
+        "doraditas integral",
+        "gullon vitalday",
+        "gullon",
+        "cookie",
+        "cookies",
+        "oreo",
+        "chokis",
+        "chips ahoy",
+        "festival",
+        "emperador",
+        "mamut",
+    ]):
+        return "SWEET_COOKIES"
+    
+    if any(k in text for k in [
+        "integral", "whole wheat", "wholewheat",
+        "whole grain"
+    ]):
+        return "WHOLE_WHEAT_BREAD"
+
+    if any(k in text for k in [
+        "multigrano", "multigrain", "multicereal",
+        "7 cereales", "avena", "oat", "fibra",
+        "semillas", "ajonjoli", "ajonjolí"
+    ]):
+        return "SPECIALTY_BREAD"
+
+    if any(k in text for k in [
+        "pan blanco", "white bread", "sandwich blanco",
+        "viga blanco", "blanco familiar"
+    ]):
+        return "WHITE_BREAD"
+    
+    if any(k in text for k in [
+        "soda", "saltina", "cracker", "crackers",
+        "ritz", "club social", "saladitas"
+    ]):
+        return "SAVORY_CRACKERS"    
+    
+    if any(k in text for k in [
+        "oreo", "chokis", "chips ahoy", "festival",
+        "emperador", "galleta", "galletas", "cookie",
+        "cookies", "mamut"
+    ]):
+        return "SWEET_COOKIES"
+    if any(k in text for k in [
+        "wafer", "waffer", "barquillo"
+    ]):
+        return "WAFERS"
+
+
+    if any(k in text for k in [
+        "pringles", "doritos", "tostitos", "cheetos",
+        "takis", "chips", "snack", "popcorn"
+    ]):
+        return "SALTY_SNACKS"
+
+    if any(k in text for k in [
+        "croissant", "muffin", "brownie", "bizcocho",
+        "cake", "cupcake", "ponque", "ponqué"
+    ]):
+        return "SWEET_BAKERY"
+
+    return "OTHER"
 
 def harmonize_barcode(barcode):
 
@@ -1611,6 +1743,16 @@ def build_regional_dataset():
         regional_df["commercial_family_key"]
     )
 
+    # ==================================================
+    # COMMERCIAL CATEGORY
+    # ==================================================
+
+    regional_df["commercial_category"] = (
+        regional_df.apply(
+            classify_commercial_category,
+            axis=1
+        )
+    )
     regional_df["commercial_overlap"] = (
         regional_df.groupby("commercial_family_key")["country"]
         .transform("nunique")
