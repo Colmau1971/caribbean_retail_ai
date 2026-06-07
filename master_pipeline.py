@@ -369,6 +369,75 @@ def clean_product_name(
 
     return clean.title()
 
+def harmonize_product_name(name, brand=None):
+
+    if pd.isna(name):
+        return "unknown"
+
+    x = str(name).lower()
+
+    if brand and pd.notna(brand):
+        x = re.sub(
+            rf"\b{re.escape(str(brand).lower())}\b",
+            "",
+            x
+        )
+
+    replacements = {
+        "cookies and cream": "cookies cream",
+        "cookies & cream": "cookies cream",
+        "choc chip": "chocolate chip",
+        "choco chip": "chocolate chip",
+        "sour cream & onion": "sour cream onion",
+        "sour cream and onion": "sour cream onion",
+        "s cream onion": "sour cream onion",
+        "waffer": "wafer",
+        "vainilla": "vanilla",
+        "limon": "lemon",
+        "limón": "lemon",
+        "chocolate": "chocolate",
+        "original": "original",
+    }
+
+    for old, new in replacements.items():
+        x = x.replace(old, new)
+
+    x = re.sub(
+        r"\b\d+([.,]\d+)?\s?(oz|lb|lbs|g|gr|kg|ml|l|ea|pack|ct|und|unidades)\b",
+        "",
+        x
+    )
+
+    x = re.sub(
+        r"[^a-z0-9\s]",
+        " ",
+        x
+    )
+
+    stopwords = {
+        "galleta", "galletas", "cookie", "cookies",
+        "cracker", "crackers", "pan", "bread",
+        "tortilla", "tortillas", "wrap", "wraps",
+        "sabor", "de", "del", "la", "el", "con",
+        "and", "with", "the", "para",
+        "sandwich", "rellena", "relleno",
+        "pack", "paq", "und", "unidad", "unidades",
+        "mini", "regular", "classic", "clasica", "clasico",
+    }
+
+    tokens = [
+        t
+        for t in x.split()
+        if len(t) >= 3 and t not in stopwords
+    ]
+
+    tokens = sorted(set(tokens))
+
+    if not tokens:
+        return "unknown"
+
+    return "_".join(tokens[:5]) 
+
 def standardize_category(value):
 
     if pd.isna(value):
@@ -1438,10 +1507,41 @@ def build_regional_dataset():
         )
         .head(20)
     )
-       # ==================================================
+
+    # ==================================================
+    # PRODUCT NAME HARMONIZATION
+    # ==================================================
+
+    regional_df["product_name_harmonized"] = (
+        regional_df.apply(
+            lambda row: harmonize_product_name(
+                row.get("product_name", ""),
+                row.get("brand", "")
+            ),
+            axis=1
+        )
+    )
+
+    # ==================================================
     # FAMILY KEY - FUZZY COMMERCIAL MATCH
     # ==================================================
     def family_key(row):
+
+        brand = normalize_sku_text(
+            row.get("brand", "")
+        )
+
+        product = str(
+            row.get("product_name_harmonized", "unknown")
+        ).strip()
+
+        if not brand:
+            brand = "unknown"
+
+        if not product:
+            product = "unknown"
+
+        return f"{brand}_{product}"
 
         brand = normalize_sku_text(
             row.get("brand", "")
