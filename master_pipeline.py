@@ -13,6 +13,7 @@ from pathlib import Path
 from datetime import datetime
 
 from brand_dictionary import infer_brand as infer_brand_from_dictionary
+from product_dictionary import infer_product_from_dictionary
 
 FORCE_SCRAPE = False
 # ======================================================
@@ -373,7 +374,12 @@ def harmonize_product_name(name, brand=None):
 
     if pd.isna(name):
         return "unknown"
+    
+    dictionary_product = infer_product_from_dictionary(name)
 
+    if dictionary_product:
+        return dictionary_product
+    
     x = str(name).lower()
 
     if brand and pd.notna(brand):
