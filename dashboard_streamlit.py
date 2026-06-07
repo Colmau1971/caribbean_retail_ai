@@ -196,7 +196,19 @@ weight_coverage = (
     else np.nan
 )
 
-kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+commercial_overlap_skus = (
+    filtered[filtered["commercial_overlap"] > 1].shape[0]
+    if "commercial_overlap" in filtered.columns
+    else 0
+)
+
+sku_overlap_skus = (
+    filtered[filtered["sku_overlap"] > 1].shape[0]
+    if "sku_overlap" in filtered.columns
+    else 0
+)
+
+kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
 
 kpi1.metric("Total Records", f"{total_records:,.0f}")
 kpi2.metric("Unique Products", f"{unique_products:,.0f}")
@@ -205,7 +217,15 @@ kpi4.metric(
     "Precio mediano USD/kg",
     f"${avg_price_kg:,.2f}" if pd.notna(avg_price_kg) else "N/A"
 )
+kpi5.metric(
+    "Commercial Overlap",
+    f"{commercial_overlap_skus:,.0f}"
+)
 
+kpi6.metric(
+    "SKU Overlap",
+    f"{sku_overlap_skus:,.0f}"
+)
 kpi5, kpi6, kpi7, kpi8 = st.columns(4)
 
 kpi5.metric("Países", f"{total_countries}")
