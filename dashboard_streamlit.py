@@ -118,6 +118,20 @@ categories = st.sidebar.multiselect(
     sorted(df["standard_category"].dropna().unique()),
     default=sorted(df["standard_category"].dropna().unique())
 )
+commercial_categories = []
+
+if "commercial_category" in df.columns:
+    commercial_categories = sorted(
+        df["commercial_category"]
+        .dropna()
+        .unique()
+    )
+
+selected_commercial_categories = st.sidebar.multiselect(
+    "Commercial Category",
+    commercial_categories,
+    default=commercial_categories
+)
 
 retailers = st.sidebar.multiselect(
     "Retailer",
@@ -153,7 +167,14 @@ if brand_groups:
     filtered = filtered[
         filtered["brand_group"].astype(str).isin(brand_groups)
     ]
-
+if (
+    "commercial_category" in filtered.columns
+    and selected_commercial_categories
+):
+    filtered = filtered[
+        filtered["commercial_category"]
+        .isin(selected_commercial_categories)
+    ]
 # ==============================
 # KPIs
 # ==============================
@@ -647,7 +668,7 @@ category_intelligence_df = (
         ]
     )
     .groupby(
-        ["country", "standard_category"],
+        ["country", "commercial_category"],
         as_index=False
     )
     .agg(
@@ -661,7 +682,7 @@ category_intelligence_df = (
 if not category_intelligence_df.empty:
     fig = px.bar(
         category_intelligence_df,
-        x="standard_category",
+        x="commercial_category",
         y="avg_price_kg_usd",
         color="country",
         barmode="group",
@@ -676,7 +697,7 @@ if not category_intelligence_df.empty:
     category_matrix = (
         category_intelligence_df
         .pivot_table(
-            index="standard_category",
+            index="commercial_category",
             columns="country",
             values="avg_price_kg_usd"
         )
@@ -741,17 +762,33 @@ else:
 # ==============================
 
 st.subheader("🌎 Same SKU Cross Country")
+view_match = st.radio(
+    "Match Type",
+    [
+        "Commercial Families",
+        "Exact SKU"
+    ],
+    horizontal=True
+)
+
 
 match_col = None
 
-if "family_key" in filtered.columns:
-    match_col = "family_key"
-elif "match_key" in filtered.columns:
-    match_col = "match_key"
-elif "barcode_harmonized" in filtered.columns:
-    match_col = "barcode_harmonized"
-elif "barcode" in filtered.columns:
-    match_col = "barcode"
+if view_match == "Commercial Families":
+    if "commercial_family_key" in filtered.columns:
+        match_col = "commercial_family_key"
+
+elif view_match == "Exact SKU":
+    if "sku_family_key" in filtered.columns:
+        match_col = "sku_family_key"
+
+if match_col is None:
+    if "match_key" in filtered.columns:
+        match_col = "match_key"
+    elif "barcode_harmonized" in filtered.columns:
+        match_col = "barcode_harmonized"
+    elif "barcode" in filtered.columns:
+        match_col = "barcode"
 
 if match_col:
     sku_cross = (
@@ -792,9 +829,14 @@ if match_col:
         same1, same2, same3 = st.columns(3)
 
         same1.metric(
-            "Shared SKU Families",
+            (
+                "Commercial Families"
+                if view_match == "Commercial Families"
+                else "Exact SKU Matches"
+            ),
             f"{len(sku_cross):,.0f}"
         )
+            
 
         same2.metric(
             "Median Price Gap",
@@ -824,7 +866,11 @@ if match_col:
                     "brand",
                     "product_name"
                 ],
-                title="Regional SKU Arbitrage"
+                title=(
+                    "Commercial Opportunity Arbitrage"
+                    if view_match == "Commercial Families"
+                    else "Exact SKU Arbitrage"
+                )
             )
 
             st.plotly_chart(
