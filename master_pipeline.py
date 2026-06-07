@@ -936,6 +936,46 @@ def safe_load_csv(path, country):
             df["product_name"]
             .apply(detect_segment)
         )
+        # =========================
+        # REMOVE FAKE CATEGORY ROWS
+        # =========================
+
+        FAKE_PRODUCTS = {
+            "other",
+            "bakery",
+            "cookies",
+            "null",
+            "brandy/cognac",
+            "non alcoholic wine",
+            "gift cards",
+            "phone cards - pin top up",
+            "pharmacy",
+            "pharmaceutical",
+            "personal care",
+            "paper products",
+            "packaging supplies other",
+            "paint",
+            "pain relief",
+            "oxtails",
+            "parboiled rice",
+            "pasta",
+            "penne",
+        }
+
+        before_rows = len(df)
+
+        df = df[
+            ~df["product_name"]
+            .astype(str)
+            .str.strip()
+            .str.lower()
+            .isin(FAKE_PRODUCTS)
+        ].copy()
+
+        removed_rows = before_rows - len(df)
+
+        if removed_rows > 0:
+            print(f"Removed fake/category rows {country}: {removed_rows}")
 
         print(f"Rows loaded {country}: {len(df)}")
 
