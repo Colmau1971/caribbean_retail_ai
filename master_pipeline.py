@@ -1587,19 +1587,42 @@ def build_regional_dataset():
 
         return f"{brand}_{key_tokens}"
 
-    regional_df["family_key"] = regional_df.apply(
-        family_key,
-        axis=1
+    # ==================================================
+    # FAMILY KEYS
+    # ==================================================
+
+    regional_df["commercial_family_key"] = (
+        regional_df.apply(
+            family_key,
+            axis=1
+        )
+    )
+
+    regional_df["sku_family_key"] = (
+        regional_df["brand"]
+        .astype(str)
+        .apply(normalize_sku_text)
+        + "_"
+        + regional_df["product_name_harmonized"]
+        .astype(str)
+    )
+
+    regional_df["family_key"] = (
+        regional_df["commercial_family_key"]
     )
 
     regional_df["commercial_overlap"] = (
-        regional_df.groupby("family_key")["country"]
+        regional_df.groupby("commercial_family_key")["country"]
+        .transform("nunique")
+    )
+
+    regional_df["sku_overlap"] = (
+        regional_df.groupby("sku_family_key")["country"]
         .transform("nunique")
     )
 
     regional_df["regional_overlap"] = (
-        regional_df.groupby("family_key")["country"]
-        .transform("nunique")
+        regional_df["commercial_overlap"]
     )
 
     print("\nCommercial Overlap")
