@@ -1547,7 +1547,7 @@ def build_regional_dataset():
         if not product:
             product = "unknown"
 
-        return f"{brand}_{product}"
+        return f"{product}"
 
         brand = normalize_sku_text(
             row.get("brand", "")

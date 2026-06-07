@@ -71,6 +71,183 @@ PRODUCT_DICTIONARY = {
         "toufayan bagels",
         "bagels toufayan",
     ],
+
+    "club_social_original": [
+        "club social original",
+        "galletas club social original",
+        "galleta integral multicereal club social",
+    ],
+
+    "club_social_integral": [
+        "club social integral",
+        "galleta integral club social",
+        "galletas integrales club social",
+    ],
+
+    "guarina_leche": [
+        "galletas de leche guarina",
+        "guarina leche",
+    ],
+
+    "guarina_saladitas": [
+        "galletas saladitas guarina",
+        "saladitas guarina",
+    ],
+
+    "guarina_club_max_queso": [
+        "guarina club max queso",
+        "galletas saladas guarina club max queso",
+    ],
+
+    "dino_chocolate": [
+        "dino galleta sandwich chocolate",
+        "galleta sandwich chocolate dino",
+    ],
+
+    "dino_vainilla": [
+        "dino galleta sandwich vainilla",
+        "galleta sandwich vainilla dino",
+    ],
+
+    "dino_duplex": [
+        "dino galleta sandwich duplex",
+        "galleta sandwich duplex dino",
+    ],
+
+    "gamesa_chokis": [
+        "galleta mini chokis gamesa",
+        "galletas chokis",
+        "chokis gamesa",
+    ],
+
+    "gamesa_emperador_chocolate": [
+        "galleta de chocolate gamesa emperador",
+        "emperador chocolate gamesa",
+    ],
+
+    "gamesa_emperador_vainilla": [
+        "galleta emperador vainilla gamesa",
+        "emperador vainilla gamesa",
+    ],
+
+    "toufayan_pita_integral": [
+        "mini pita integral toufayan",
+        "pita integral toufayan",
+    ],
+
+    "toufayan_bagels_cinnamon_raisin": [
+        "bagels de pasas y canela toufayan",
+        "toufayan bagels cinnamon raisin",
+        "bagels canela pasas",
+    ],
+
+    "toufayan_bagels_everything": [
+        "bagels everything toufayan",
+        "toufayan bagels everything",
+    ],
+
+    "maria_tortilla_burrito": [
+        "maria tortillas de trigo estilo burritos",
+        "tortilla de trigo burrito maria",
+        "burrito trigo maria",
+    ],
+
+    "maria_tortilla_taco": [
+        "maria tortillas de trigo estilo tacos",
+        "tortilla de trigo tacos maria",
+        "tacos trigo maria",
+    ],
+
+    "tostitos_hint_lime": [
+        "chips de tortilla de maiz sabor hint of lime tostitos",
+        "tostitos hint of lime",
+        "hint lime tostitos",
+    ],
+
+    "tostitos_santa_elena": [
+        "chips de tortillas de maiz tostitos santa elena",
+        "tostitos santa elena",
+    ],
+
+    "bauducco_wafer_fresa": [
+        "galleta wafer con relleno sabor fresa bauducco",
+        "bauducco wafer fresa",
+        "bauducco wafer strawberry",
+    ],
+
+    "bauducco_wafer_lemon": [
+        "bauducco wafer lemon",
+        "bauducco wafer limon",
+        "wafer limon bauducco",
+    ],   
+
+
+    "saltina_cracker": [
+        "galleta de soda saltina aviva",
+        "saltina aviva",
+        "galleta de soda saltina hatuey",
+        "saltina hatuey",
+    ],   
+    "club_social_saladas": [
+        "galletas saladas club social",
+        "club social saladas",
+    ],    
+    "guarina_club_max": [
+        "club max saladas",
+        "galletas saladas guarina club max",
+    ],
+    "oreo_cookies_cream": [
+        "cookies and cream oreo",
+        "cookie n cream oreo",
+        "cream dulce oreo",
+        "chocolate crema oreo",
+    ],
+    "wheat_tortilla": [
+        "tortilla trigo",
+        "tortillas de trigo",
+        "wrap trigo",
+    ],
+        "hamburger_buns": [
+        "pan de hamburguesa",
+        "hamburguesa",
+        "hamburger buns",
+    ],
+    "hotdog_buns": [
+        "pan de hot dog",
+        "hot dog",
+        "hotdog",
+    ],
+    "multigrain_bread": [
+        "multigranos",
+        "multicereal",
+        "7 cereales",
+    ],
+    "wafer_vanilla": [
+        "wafer vainilla",
+        "wafer vanilla",
+    ],
+    "wafer_chocolate": [
+        "wafer chocolate",
+        "wafer choco",
+    ],
+    "soda_cracker": [
+
+        "soda crackers",
+        "sodas crackers",
+        "sodas cracker",
+
+        "galleta de soda",
+        "galletas de soda",
+
+        "hatuey soda",
+        "aviva soda",
+        "lider soda",
+
+        "noel sodas crackers",
+        "dux crackers sodas",
+
+    ],
+
 }
 
 
