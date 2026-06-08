@@ -6,6 +6,28 @@ import numpy as np
 from glob import glob
 
 # ==============================
+# CATEGORY LABELS
+# ==============================
+
+CATEGORY_LABELS = {
+    "WHITE_BREAD": "Pan Blanco",
+    "WHOLE_WHEAT_BREAD": "Pan Integral",
+    "SPECIALTY_BREAD": "Pan Especial",
+    "HAMBURGER_BUNS": "Pan Hamburguesa",
+    "HOTDOG_BUNS": "Pan Hot Dog",
+    "TORTILLAS_WRAPS": "Tortillas y Wraps",
+    "PITA_FLATBREAD": "Pita y Flatbread",
+    "TOASTED_BREAD": "Pan Tostado",
+    "BAGELS": "Bagels",
+    "SWEET_COOKIES": "Galletas Dulces",
+    "SAVORY_CRACKERS": "Galletas Saladas",
+    "WAFERS": "Wafers",
+    "SALTY_SNACKS": "Snacks Salados",
+    "SWEET_BAKERY": "Pastelería Dulce",
+    "OTHER": "Otros"
+}
+
+# ==============================
 # CONFIG
 # ==============================
 
@@ -67,6 +89,12 @@ def load_data():
 
 
 df = load_data()
+if "commercial_category" in df.columns:
+    df["commercial_category_label"] = (
+        df["commercial_category"]
+        .map(CATEGORY_LABELS)
+        .fillna(df["commercial_category"])
+    )
 
 # ==============================
 # COLUMN NORMALIZATION
@@ -122,15 +150,20 @@ commercial_categories = []
 
 if "commercial_category" in df.columns:
     commercial_categories = sorted(
-        df["commercial_category"]
+        df["commercial_category_label"]
         .dropna()
         .unique()
     )
-
 selected_commercial_categories = st.sidebar.multiselect(
-    "Commercial Category",
+    "Categoría Comercial",
     commercial_categories,
     default=commercial_categories
+)    
+
+commercial_categories = sorted(
+    df["commercial_category_label"]
+    .dropna()
+    .unique()
 )
 
 retailers = st.sidebar.multiselect(
@@ -162,7 +195,14 @@ if brands:
     filtered = filtered[
         filtered["brand"].astype(str).isin(brands)
     ]
-
+if (
+    "commercial_category" in filtered.columns
+    and selected_commercial_categories
+):
+    filtered = filtered[
+        filtered["commercial_category_label"]
+        .isin(selected_commercial_categories)
+    ]
 if brand_groups:
     filtered = filtered[
         filtered["brand_group"].astype(str).isin(brand_groups)
@@ -172,9 +212,9 @@ if (
     and selected_commercial_categories
 ):
     filtered = filtered[
-        filtered["commercial_category"]
-        .isin(selected_commercial_categories)
-    ]
+                filtered["commercial_category_label"]
+                .isin(selected_commercial_categories)
+            ]
 # ==============================
 # KPIs
 # ==============================
@@ -270,18 +310,18 @@ col1, col2 = st.columns(2)
 with col1:
     price_country = (
         filtered.dropna(subset=["price_per_kg_usd"])
-        .groupby(["country", "standard_category"], as_index=False)
+        .groupby(["country", "commercial_category"], as_index=False)
         .agg(avg_price_kg=("price_per_kg_usd", "mean"))
     )
 
     if not price_country.empty:
         fig = px.bar(
             price_country,
-            x="standard_category",
+            x="commercial_category",
             y="avg_price_kg",
             color="country",
             barmode="group",
-            title="Precio promedio USD/kg por país y categoría"
+            title="Precio promedio USD/kg por país y categoría comercial"
         )
         st.plotly_chart(fig, width="stretch")
     else:
