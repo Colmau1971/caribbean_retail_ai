@@ -22,6 +22,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.append(str(ROOT_DIR))
 
 from brand_dictionary import infer_brand
+from search_dictionary import get_market_search_terms
 
 BASE_URL = "https://groceriestogoaruba.com"
 RETAILER = "Groceries To Go Aruba"
@@ -39,38 +40,7 @@ TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M")
 
 AWG_USD_RATE = 1.79
 
-SEARCH_TERMS = {
-    "Bakery": [
-        "bread",
-        "bun",
-        "bagel",
-        "rolls",
-        "pita",
-        "naan",
-        "flatbread",
-    ],
-
-    "Tortillas & Wraps": [
-        "tortilla",
-        "tortillas",
-        "wrap",
-        "wraps",
-        "flatbread",
-    ],
-
-    "Cookies & Crackers": [
-        "cookies",
-        "biscuits",
-        "crackers",
-        "wafer",
-        "wafers",
-    ],
-
-    "Frozen Bakery": [
-        "frozen bread",
-        "frozen pizza",
-    ],
-}
+SEARCH_TERMS = get_market_search_terms("Aruba")
 
 HEADERS = {
     "User-Agent": (

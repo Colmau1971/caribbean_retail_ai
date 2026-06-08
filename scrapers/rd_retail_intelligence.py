@@ -18,6 +18,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.append(str(ROOT_DIR))
 
 from brand_dictionary import infer_brand
+from search_dictionary import get_market_search_terms
 
 import pandas as pd
 import re
@@ -32,48 +33,49 @@ EXCHANGE_RATE_DOP_USD = 63.11
 # =====================================================
 # CATEGORIAS
 # =====================================================
+SEARCH_TERMS = get_market_search_terms("Dominican Republic")
 
-SEARCH_TERMS = {
+#" SEARCH_TERMS = {
 
-    "Galletas": [
-        "galletas",
-        "galleta",
-        "oreo",
-        "wafer",
-        "club social",
-        "festival",
-    ],
+ #   "Galletas": [
+ #       "galletas",
+ #       "galleta",
+ #       "oreo",
+ #       "wafer",
+ #       "club social",
+#        "festival",
+#    ],
 
-    "Tortillas": [
-        "tortilla",
-        "wrap",
-        "burrito",
-        "pita",
-    ],
+ #   "Tortillas": [
+ #       "tortilla",
+ #       "wrap",
+ #       "burrito",
+ #       "pita",
+ #   ],
 
-    "Panaderia": [
-        "pan viga",
-        "pan integral",
-        "pan sandwich",
-        "pan de hamburguesa",
-        "pan de hot dog",
-        "croissant",
-        "bagel",
-        "brioche",
-        "flatbread","Pan Mini",
-        "Pan Maxi",
-        "Pan con macadamia",
-        "Flat Bread",
-    ],
+#    "Panaderia": [
+#        "pan viga",
+#        "pan integral",
+#        "pan sandwich",
+#        "pan de hamburguesa",
+#        "pan de hot dog",
+#        "croissant",
+#        "bagel",
+#        "brioche",
+#        "flatbread","Pan Mini",
+#        "Pan Maxi",
+#        "Pan con macadamia",
+#        "Flat Bread",
+#    ],
 
-    "Pasteleria": [
-        "bizcocho",
-        "cake",
-        "brownie",
-        "muffin",
-        "cupcake",
-    ]
-}
+#    "Pasteleria": [
+#        "bizcocho",
+#        "cake",
+#        "brownie",
+#        "muffin",
+#        "cupcake",
+#    ]
+#}
 # =====================================================
 # MARCAS
 # =====================================================
@@ -587,77 +589,6 @@ def es_exclusion(nombre):
 
     return any(x in n for x in exclusiones)
 
-def clasificar(nombre, categoria):
-
-    n = nombre.lower()
-
-    if categoria == "Galletas":
-
-        if "wafer" in n or "waffer" in n:
-            return "Wafer"
-
-        if "sandwich" in n or "oreo" in n:
-            return "Dulce Sandwich"
-
-        if "soda" in n or "saltina" in n or "salada" in n:
-            return "Salada"
-
-        if (
-            "integral" in n
-            or "fibra" in n
-            or "avena" in n
-            or "linaza" in n
-        ):
-            return "Funcional"
-
-        return "Galleta"
-
-    if categoria == "Tortillas":
-
-        if "wrap" in n:
-            return "Wrap"
-
-        if "maiz" in n or "maíz" in n:
-            return "Maíz"
-
-        if "trigo" in n:
-            return "Trigo"
-
-        if "low carb" in n or "keto" in n:
-            return "Low Carb/Keto"
-
-        return "Tortilla"
-
-    if categoria == "Panaderia":
-
-        if "bagel" in n:
-            return "Bagel"
-
-        if "pita" in n:
-            return "Pita"
-
-        if "naan" in n:
-            return "Naan"
-
-        if "brioche" in n:
-            return "Brioche"
-
-        return "Panadería"
-
-    if categoria == "Pasteleria":
-
-        if "brownie" in n:
-            return "Brownie"
-
-        if "muffin" in n:
-            return "Muffin"
-
-        if "cupcake" in n:
-            return "Cupcake"
-
-        return "Pastelería"
-
-    return categoria
 
 # =====================================================
 # START
@@ -821,10 +752,7 @@ for categoria, terms in SEARCH_TERMS.items():
     
                 marca = infer_brand(nombre)
                 
-                tipo = clasificar(
-                    nombre,
-                    categoria
-                )
+                tipo = categoria
     
                 weight_kg = extract_weight_kg(pres)
     
@@ -919,6 +847,7 @@ for categoria, terms in SEARCH_TERMS.items():
                             # Core fields
                             "category": categoria,
                             "source_category": categoria,
+                            "commercial_category": categoria,
                             "retailer": retailer,
                             "brand": marca,
                             "product_name": nombre,

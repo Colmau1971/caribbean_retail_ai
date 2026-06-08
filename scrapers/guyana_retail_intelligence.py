@@ -17,6 +17,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 
+from search_dictionary import get_market_search_terms
+
 import undetected_chromedriver as uc
 
 
@@ -39,21 +41,7 @@ LMSTUDIO_DIR.mkdir(parents=True, exist_ok=True)
 MASSY_BASE_URL = "https://www.shopmassystoresgy.com"
 FRANCIS_BOUNTY_URL = "https://francisdegossiper.com/store/bounty-supermarket/"
 
-SEARCH_TERMS = {
-    "Bakery": [
-        "bread", "breads", "bun", "buns", "bagel",
-        "rolls", "wrap", "wraps", "tortilla", "tortillas"
-    ],
-    "Cookies & Crackers": [
-        "cookies", "biscuits", "crackers", "wafer", "wafers"
-    ],
-    "Snacks": [
-        "chips", "snacks", "popcorn", "pretzels", "cheese snacks"
-    ],
-    "Frozen Bakery": [
-        "frozen bread", "frozen pastry", "frozen dough", "frozen pizza"
-    ]
-}
+SEARCH_TERMS = get_market_search_terms("Guyana")
 
 HEADERS = {
     "User-Agent": (
@@ -725,35 +713,6 @@ def extract_weight_kg(product_name: str):
     return None
 
 
-def classify_category(product_name: str, source_category: str):
-    name = product_name.lower()
-
-    if any(x in name for x in ["tortilla", "wrap"]):
-        return "Tortillas & Wraps"
-
-    if any(x in name for x in ["bread", "loaf", "bun", "roll", "bagel"]):
-        return "Bread & Buns"
-
-    if any(x in name for x in ["cookie", "biscuit", "wafer"]):
-        return "Cookies"
-
-    if "cracker" in name:
-        return "Crackers"
-
-    if any(
-        x in name
-        for x in [
-            "chips", "snack", "popcorn", "pretzel",
-            "cheese puff", "cheetos"
-        ]
-    ):
-        return "Snacks"
-
-    if any(x in name for x in ["pizza", "dough", "pastry", "frozen"]):
-        return "Frozen Bakery"
-
-    return source_category
-
 
 def classify_segment(price_per_kg_usd):
     if price_per_kg_usd is None or pd.isna(price_per_kg_usd):
@@ -803,13 +762,9 @@ def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         extract_weight_kg
     )
 
-    df["category"] = df.apply(
-        lambda r: classify_category(
-            r["product_name"],
-            r["source_category"]
-        ),
-        axis=1
-    )
+    df["category"] = df["source_category"]
+
+    df["commercial_category"] = df["source_category"]
 
     df["price_usd"] = df["price_gyd"] / EXCHANGE_RATE_GYD_USD
 
@@ -844,7 +799,7 @@ def create_summary(df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
 
     return df.groupby(
-        ["retailer", "category"]
+        ["retailer", "commercial_category"]
     ).agg(
         skus=("product_name", "count"),
         brands=("brand", "nunique"),
@@ -865,7 +820,7 @@ def create_alerts(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return pd.DataFrame(alerts)
 
-    for (retailer, category), group in df.groupby(["retailer", "category"]):
+    for (retailer, category), group in df.groupby(["retailer", "commercial_category"]):
         valid = group.dropna(subset=["price_per_kg_usd"])
 
         if valid.empty:

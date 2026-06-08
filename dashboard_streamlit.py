@@ -287,7 +287,7 @@ kpi6.metric(
     "SKU Overlap",
     f"{sku_overlap_skus:,.0f}"
 )
-kpi5, kpi6, kpi7, kpi8 = st.columns(4)
+kpi5, kpi6, kpi7, kpi8, kpi9 = st.columns(5)
 
 kpi5.metric("Países", f"{total_countries}")
 kpi6.metric("Categorías", f"{total_categories}")
@@ -298,6 +298,10 @@ kpi7.metric(
 kpi8.metric(
     "Weight Coverage",
     f"{weight_coverage:,.1f}%" if pd.notna(weight_coverage) else "N/A"
+)
+kpi9.metric(
+    "Retailers",
+    filtered["retailer"].nunique()
 )
 # ==============================
 # PRICE INTELLIGENCE
@@ -310,14 +314,14 @@ col1, col2 = st.columns(2)
 with col1:
     price_country = (
         filtered.dropna(subset=["price_per_kg_usd"])
-        .groupby(["country", "commercial_category"], as_index=False)
+        .groupby(["country", "commercial_category_label"], as_index=False)
         .agg(avg_price_kg=("price_per_kg_usd", "mean"))
     )
 
     if not price_country.empty:
         fig = px.bar(
             price_country,
-            x="commercial_category",
+            x="commercial_category_label",
             y="avg_price_kg",
             color="country",
             barmode="group",
@@ -361,6 +365,38 @@ with col2:
         st.plotly_chart(fig, width="stretch")
     else:
         st.info("No hay datos suficientes de marcas.")
+        
+st.subheader("🏪 Precio promedio USD/kg por Retailer")
+
+retailer_price = (
+    filtered.dropna(subset=["price_per_kg_usd"])
+    .groupby(
+        ["country", "retailer"],
+        as_index=False
+    )
+    .agg(
+        avg_price_kg=("price_per_kg_usd", "mean"),
+        skus=("product_name", "count")
+    )
+)
+
+if not retailer_price.empty:
+
+    fig = px.bar(
+        retailer_price,
+        x="retailer",
+        y="avg_price_kg",
+        color="country",
+        hover_data=["skus"],
+        barmode="group",
+        title="Precio promedio USD/kg por retailer"
+    )
+
+    st.plotly_chart(
+        fig,
+        width="stretch"
+    )
+   
 # ==============================
 # EXECUTIVE SUMMARY
 # ==============================
@@ -475,7 +511,7 @@ st.subheader("🚀 Opportunity Engine")
 
 opportunity = (
     filtered.dropna(subset=["price_per_kg_usd"])
-    .groupby(["country", "standard_category"], as_index=False)
+    .groupby(["country", "commercial_category_label"], as_index=False)
     .agg(
         avg_price_kg=("price_per_kg_usd", "mean"),
         sku_count=("brand", "count"),
@@ -510,7 +546,7 @@ if not opportunity.empty:
             y="avg_price_kg",
             size="opportunity_score",
             color="recommendation",
-            hover_data=["country", "standard_category", "brand_count"],
+            hover_data=["country", "commercial_category_label", "brand_count"],
             title="Opportunity Matrix: surtido vs precio/kg"
         )
         st.plotly_chart(fig, width="stretch")
@@ -524,7 +560,7 @@ if not opportunity.empty:
         fig = px.bar(
             top_opp,
             x="opportunity_score",
-            y="standard_category",
+            y="commercial_category_label",
             color="country",
             orientation="h",
             title="Top oportunidades regionales"
@@ -708,7 +744,7 @@ category_intelligence_df = (
         ]
     )
     .groupby(
-        ["country", "commercial_category"],
+        ["country", "commercial_category_label"],
         as_index=False
     )
     .agg(
@@ -722,7 +758,7 @@ category_intelligence_df = (
 if not category_intelligence_df.empty:
     fig = px.bar(
         category_intelligence_df,
-        x="commercial_category",
+        x="commercial_category_label",
         y="avg_price_kg_usd",
         color="country",
         barmode="group",
@@ -737,7 +773,7 @@ if not category_intelligence_df.empty:
     category_matrix = (
         category_intelligence_df
         .pivot_table(
-            index="commercial_category",
+            index="commercial_category_label",
             columns="country",
             values="avg_price_kg_usd"
         )
@@ -773,7 +809,7 @@ if not category_intelligence_df.empty:
             index_matrix
             .reset_index()
             .melt(
-                id_vars="standard_category",
+                id_vars="commercial_category_label",
                 var_name="country",
                 value_name="index_vs_rd"
             )
@@ -781,7 +817,16 @@ if not category_intelligence_df.empty:
 
         fig = px.bar(
             index_long,
-            x="standard_category",
+            x="commercial_category_label",
+            y="index_vs_rd",
+            color="country",
+            barmode="group",
+            title="Category Price Index vs Dominican Republic"
+        )
+
+        fig = px.bar(
+            index_long,
+            x="commercial_category_label",
             y="index_vs_rd",
             color="country",
             barmode="group",
