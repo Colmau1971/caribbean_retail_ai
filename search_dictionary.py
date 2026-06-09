@@ -232,7 +232,7 @@ SEARCH_DICTIONARY = {
             "frozen pastry", "frozen pizza"
         ],
         "Aruba": [
-            "frozen", "frozen bread",
+            "frozen bread",
             "frozen pizza", "frozen pastry"
         ],
     },

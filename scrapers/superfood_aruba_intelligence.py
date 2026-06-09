@@ -850,86 +850,53 @@ def main():
         print("No se encontraron productos.")
         return
 
-    df = df.drop_duplicates()
+    # ==========================================
+    # SMART DEDUPLICATION
+    # ==========================================
 
-    output_file = (
-        OUTPUT_DIR /
-        f"superfood_aruba_retail_intelligence_{TIMESTAMP}.csv"
+    df["barcode_clean"] = (
+        df["barcode"]
+        .astype("string")
+        .str.replace(".0", "", regex=False)
+        .str.strip()
     )
 
-    latest_file = (
-        OUTPUT_DIR /
-        "superfood_aruba_retail_intelligence_latest.csv"
+    with_barcode = df[
+        df["barcode_clean"].notna()
+        & (df["barcode_clean"] != "")
+        & (df["barcode_clean"] != "nan")
+    ].drop_duplicates(
+        subset=[
+            "barcode_clean",
+            "retailer"
+        ]
     )
 
-    df.to_csv(
-        output_file,
-        index=False,
-        encoding="utf-8-sig"
+    without_barcode = df[
+        df["barcode_clean"].isna()
+        | (df["barcode_clean"] == "")
+        | (df["barcode_clean"] == "nan")
+    ].drop_duplicates(
+        subset=[
+            "product_name",
+            "price_local",
+            "retailer"
+        ]
     )
 
-    df.to_csv(
-        latest_file,
-        index=False,
-        encoding="utf-8-sig"
+    df = pd.concat(
+        [
+            with_barcode,
+            without_barcode
+        ],
+        ignore_index=True
     )
 
-    lm_csv, lm_txt, lm_jsonl = export_lmstudio(df)
-
-    print("\n===================================")
-    print(" SUPER FOOD ARUBA FINISHED")
-    print("===================================")
-
-    print(f"Productos totales: {len(df)}")
-    print(f"CSV: {output_file}")
-    print(f"LM CSV: {lm_csv}")
-    print(f"LM TXT: {lm_txt}")
-    print(f"LM JSONL: {lm_jsonl}")
-    print(f"CSV latest: {latest_file}")
-
-    all_products = []
-
-    for category, terms in SEARCH_TERMS.items():
-
-        for term in terms:
-
-            driver = None
-
-            try:
-
-                driver = start_driver()
-
-                products = scrape_search(
-                    driver,
-                    category,
-                    term
-                )
-
-                all_products.extend(products)
-
-            except Exception as e:
-
-                print(
-                    f"ERROR EN {category} | {term}: {e}"
-                )
-
-            finally:
-
-                try:
-                    if driver:
-                        driver.quit()
-                except Exception:
-                    pass
-
-            time.sleep(3)
-
-    df = pd.DataFrame(all_products)
-
-    if df.empty:
-        print("No se encontraron productos.")
-        return
-
-    df = df.drop_duplicates()
+    df = df.drop(
+        columns=[
+            "barcode_clean"
+        ]
+    )
 
     output_file = (
         OUTPUT_DIR /
@@ -969,3 +936,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

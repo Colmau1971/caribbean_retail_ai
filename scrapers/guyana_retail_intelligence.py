@@ -17,6 +17,13 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from pathlib import Path
 
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 from search_dictionary import get_market_search_terms
 
 import undetected_chromedriver as uc
