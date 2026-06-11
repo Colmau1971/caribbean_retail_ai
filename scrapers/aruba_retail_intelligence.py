@@ -133,6 +133,114 @@ def extract_weight_kg(text):
 
 
 def classify_category(name, source_category):
+
+    if not name:
+        return source_category
+
+    n = name.lower()
+
+    if "wafer" in n:
+        return "WAFERS"
+
+    if "bagel" in n:
+        return "BAGELS"
+
+    if "pita chips" in n:
+        return "SALTY_SNACKS"
+
+    if "pita" in n or "naan" in n:
+        return "PITA_FLATBREAD"
+
+    if (
+        "wrap" in n
+        or "tortilla" in n
+        or "flatbread" in n
+    ):
+        return "TORTILLAS_WRAPS"
+
+    if "hamburger" in n or "burger bun" in n:
+        return "HAMBURGER_BUNS"
+
+    if "hot dog" in n or "hotdog" in n:
+        return "HOTDOG_BUNS"
+
+    if "toast" in n or "beschuit" in n:
+        return "TOASTED_BREAD"
+
+    if any(
+        x in n
+        for x in [
+            "ritz",
+            "club social",
+            "cracker",
+            "saltine"
+        ]
+    ):
+        return "SAVORY_CRACKERS"
+
+    if any(
+        x in n
+        for x in [
+            "oreo",
+            "cookie",
+            "biscuit",
+            "festival"
+        ]
+    ):
+        return "SWEET_COOKIES"
+
+    if any(
+        x in n
+        for x in [
+            "lays",
+            "doritos",
+            "pringles",
+            "takis",
+            "chips",
+            "popcorn",
+            "pretzel"
+        ]
+    ):
+        return "SALTY_SNACKS"
+
+    if any(
+        x in n
+        for x in [
+            "croissant",
+            "muffin",
+            "brownie",
+            "cake"
+        ]
+    ):
+        return "SWEET_BAKERY"
+
+    if "frozen" in n:
+        return "FROZEN_BAKERY"
+
+    if any(
+        x in n
+        for x in [
+            "multigrain",
+            "volkoren",
+            "seed",
+            "grain",
+            "oat"
+        ]
+    ):
+        return "SPECIALTY_BREAD"
+
+    if "whole wheat" in n or "wheat bread" in n:
+        return "WHOLE_WHEAT_BREAD"
+
+    if (
+        "bread" in n
+        or "bun" in n
+        or "roll" in n
+        or "loaf" in n
+    ):
+        return "WHITE_BREAD"
+
+    return source_category
     if not name:
         return source_category
 

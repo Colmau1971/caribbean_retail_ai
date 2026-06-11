@@ -7,233 +7,226 @@
 SEARCH_DICTIONARY = {
 
     "WHITE_BREAD": {
-        "default": ["white bread", "bread"],
         "Dominican Republic": [
-            "pan blanco", "pan sandwich", "pan viga blanco",
-            "pan familiar blanco", "pan molde blanco"
+            "pan sandwich",
+            "pan viga blanco"
         ],
         "Guyana": [
-            "white bread", "bread", "loaf", "sandwich bread"
+            "white bread",
+            "sandwich bread"
         ],
         "Aruba": [
-            "white bread", "wit brood", "white buns",
-            "witte bollen", "witte puntjes", "dinner rolls",
-            "sandwich bread"
+            "white bread",
+            "sandwich bread",
+            "witte bollen"
         ],
     },
 
     "WHOLE_WHEAT_BREAD": {
-        "default": ["whole wheat bread", "wholewheat bread"],
         "Dominican Republic": [
-            "pan integral", "pan viga integral",
-            "pan integral familiar", "pan integral sin azucar"
+            "pan integral",
+            "pan viga integral"
         ],
         "Guyana": [
-            "whole wheat bread", "wholewheat bread",
-            "wheat bread", "brown bread"
+            "whole wheat bread",
+            "brown bread"
         ],
         "Aruba": [
-            "whole wheat bread", "volkoren bread",
-            "bruine brood", "brown bread",
-            "bruine bollen", "whole wheat rolls"
+            "whole wheat bread",
+            "volkoren bread"
         ],
     },
 
     "SPECIALTY_BREAD": {
-        "default": ["multigrain bread", "seed bread"],
         "Dominican Republic": [
-            "multicereal", "multigranos", "avena",
-            "ajonjoli", "fibra", "germen de trigo"
+            "pan multicereal",
+            "pan multigrano"
         ],
         "Guyana": [
-            "multigrain bread", "oat bread", "seed bread",
-            "grain bread"
+            "multigrain bread"
         ],
         "Aruba": [
-            "multigrain bread", "volkoren", "seed bread",
-            "grain bread", "oat bread"
+            "multigrain bread"
         ],
     },
 
     "HAMBURGER_BUNS": {
-        "default": ["hamburger buns", "burger buns"],
         "Dominican Republic": [
-            "pan hamburguesa", "hamburguesa"
+            "pan hamburguesa"
         ],
         "Guyana": [
-            "hamburger buns", "burger buns"
+            "hamburger buns"
         ],
         "Aruba": [
-            "hamburger buns", "burger buns", "hamburger bread"
+            "hamburger buns"
         ],
     },
 
     "HOTDOG_BUNS": {
-        "default": ["hot dog buns", "hotdog buns"],
         "Dominican Republic": [
-            "pan hot dog", "hot dog"
+            "pan hot dog"
         ],
         "Guyana": [
-            "hot dog buns", "hotdog buns"
+            "hot dog buns"
         ],
         "Aruba": [
-            "hot dog buns", "hotdog buns", "hot dog bread"
+            "hot dog buns"
         ],
     },
 
     "TORTILLAS_WRAPS": {
-        "default": ["tortilla", "wrap", "burrito", "taco"],
         "Dominican Republic": [
-            "tortilla", "tortillas", "wrap", "burrito",
-            "taco", "tortilla trigo", "tortilla maiz"
+        "tortilla de maiz",
+        "tortilla de harina",
+        "wrap"
         ],
         "Guyana": [
-            "tortilla", "tortillas", "wrap", "wraps",
-            "burrito", "taco"
+            "tortilla",
+            "wrap"
         ],
         "Aruba": [
-            "tortilla", "tortillas", "wrap", "wraps",
-            "burrito", "taco", "tex mex", "spinach wrap",
-            "tomato wrap", "whole wheat wrap", "mission tortilla",
-            "jumbo tortilla"
+            "tortilla",
+            "wrap",
+            "tex mex"
         ],
     },
 
     "PITA_FLATBREAD": {
-        "default": ["pita", "flatbread", "naan"],
         "Dominican Republic": [
-            "pita", "pan pita", "flatbread", "naan"
+            "pan pita"
         ],
         "Guyana": [
-            "pita", "flatbread", "naan"
+            "pita",
+            "naan"
         ],
         "Aruba": [
-            "pita", "flatbread", "naan", "lavash"
+            "pita",
+            "naan"
         ],
     },
 
     "TOASTED_BREAD": {
-        "default": ["toast", "melba toast"],
         "Dominican Republic": [
-            "tostada", "tostadas", "pan tostado"
+            "tostadas"
         ],
         "Guyana": [
-            "toast", "melba toast"
+            "melba toast"
         ],
         "Aruba": [
-            "toast", "melba toast", "beschuit"
+            "beschuit"
         ],
     },
 
     "BAGELS": {
-        "default": ["bagel", "bagels"],
-        "Dominican Republic": ["bagel", "bagels"],
-        "Guyana": ["bagel", "bagels"],
+        "Dominican Republic": [
+            "bagel"
+        ],
+        "Guyana": [
+            "bagel"
+        ],
         "Aruba": [
-            "bagel", "bagels", "everything bagel",
-            "cinnamon raisin bagel"
+            "bagel"
         ],
     },
 
     "SWEET_COOKIES": {
-        "default": ["cookies", "oreo", "chips ahoy"],
         "Dominican Republic": [
-            "galletas", "oreo", "chips ahoy", "festival",
-            "chokis", "emperador", "mamut", "duetto",
-            "dino", "maria"
+            "oreo",
+            "festival",
+            "chokis",
+            "emperador"
         ],
         "Guyana": [
-            "cookies", "biscuits", "oreo", "chips ahoy",
-            "digestive", "shortbread"
+            "oreo",
+            "biscuits"
         ],
         "Aruba": [
-            "cookies", "biscuits", "oreo", "chips ahoy",
-            "festival", "maria cookies", "gullon",
-            "milano cookies", "pepperidge farm", "mamut"
+            "oreo",
+            "biscuits",
+            "festival"
         ],
     },
 
     "SAVORY_CRACKERS": {
-        "default": ["crackers", "soda crackers", "ritz"],
         "Dominican Republic": [
-            "galleta de soda", "galletas de soda",
-            "saltinas", "ritz", "club social",
-            "saladitas", "galletas saladas"
+            "ritz",
+            "saltinas",
+            "club social"
         ],
         "Guyana": [
-            "crackers", "soda crackers", "saltine crackers",
-            "ritz", "cream crackers", "water crackers"
+            "ritz",
+            "saltine crackers"
         ],
         "Aruba": [
-            "crackers", "soda crackers", "sodas crackers",
-            "ritz", "saltines", "saltine crackers",
-            "club social", "water crackers", "cream crackers",
-            "dux crackers", "noel crackers"
+            "ritz",
+            "saltine crackers",
+            "club social"
         ],
     },
 
     "WAFERS": {
-        "default": ["wafer", "wafers"],
         "Dominican Republic": [
-            "wafer", "wafers", "barquillo"
+            "wafer",
+            "barquillo"
         ],
         "Guyana": [
-            "wafer", "wafers"
+            "wafer"
         ],
         "Aruba": [
-            "wafer", "wafers", "waffer", "wafer rolls"
+            "wafer"
         ],
     },
 
     "SALTY_SNACKS": {
-        "default": [
-            "pringles", "tostitos", "doritos",
-            "cheetos", "chips"
-        ],
         "Dominican Republic": [
-            "pringles", "tostitos", "doritos",
-            "cheetos", "chips", "takis"
+            "pringles",
+            "doritos",
+            "takis"
         ],
         "Guyana": [
-            "pringles", "tostitos", "doritos",
-            "cheetos", "chips", "popcorn", "pretzels",
+            "pringles",
+            "doritos",
             "fritos"
         ],
         "Aruba": [
-            "pringles", "tostitos", "doritos",
-            "cheetos", "lays", "chips", "takis",
-            "ruffles", "fritos", "popcorn"
+            "pringles",
+            "doritos",
+            "lays",
+            "takis"
         ],
     },
 
     "SWEET_BAKERY": {
-        "default": ["croissant", "muffin", "brownie", "cake"],
         "Dominican Republic": [
-            "croissant", "muffin", "brownie",
-            "bizcocho", "ponque", "ponqué"
+            "croissant",
+            "muffin",
+            "bizcocho"
         ],
         "Guyana": [
-            "croissant", "muffin", "brownie",
-            "cake", "cupcake", "pastry"
+            "croissant",
+            "muffin",
+            "cake"
         ],
         "Aruba": [
-            "croissant", "muffin", "brownie",
-            "cake", "suiker vlinder", "sweet roll"
+            "croissant",
+            "muffin",
+            "cake"
         ],
     },
 
     "FROZEN_BAKERY": {
-        "default": ["frozen"],
         "Dominican Republic": [
-            "frozen", "congelado"
+            "pan baguette congelado",
+            "pan congelado",
+            "masa fermentada congelada",
         ],
         "Guyana": [
-            "frozen bread", "frozen dough",
-            "frozen pastry", "frozen pizza"
+            "frozen bread",
+            "frozen pastry"
         ],
         "Aruba": [
             "frozen bread",
-            "frozen pizza", "frozen pastry"
+            "frozen pastry"
         ],
     },
 }

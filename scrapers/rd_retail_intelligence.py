@@ -585,10 +585,150 @@ def es_exclusion(nombre):
         "detergente",
         "pita chips",
         "chips de pita",
+
+        "queso para tacos",
+        "salsa para tacos",
+        "sazon para tacos",
+        "sazonador para tacos",
+        "tacos de calamar",
+
+        "paño",
+        "pano",
+        "micro fibras",
+        "microfibras",
+
+        "arepa",
+        "empanada",
+
+        "hamburguesa de res",
+        "res hamburguesa",
+        "cake mix",
+        "mezcla para bizcocho",
+        "mezcla",
+        "mix",
+        "pescado",
+        "pollo",
+        "cerdo",
+        "res",
+        "pulpo",
+        "mariscos",
+        "alitas",
     ]
 
     return any(x in n for x in exclusiones)
 
+def clasificar_categoria_comercial(nombre, fallback):
+
+    n = nombre.lower()
+
+    if "wafer" in n or "barquillo" in n:
+        return "WAFERS"
+
+    if "bagel" in n:
+        return "BAGELS"
+
+    if "pita" in n or "naan" in n:
+        return "PITA_FLATBREAD"
+
+    if "wrap" in n or "tortilla" in n:
+        return "TORTILLAS_WRAPS"
+
+    if "hot dog" in n or "hotdog" in n:
+        return "HOTDOG_BUNS"
+
+    if "hamburguesa" in n or "burger" in n:
+        return "HAMBURGER_BUNS"
+
+    if (
+        "tostada" in n
+        or "pan tostado" in n
+        or "melba" in n
+    ):
+        return "TOASTED_BREAD"
+
+    if any(
+        x in n
+        for x in [
+            "ritz",
+            "club social",
+            "saltina",
+            "cracker"
+        ]
+    ):
+        return "SAVORY_CRACKERS"
+
+    if any(
+        x in n
+        for x in [
+            "oreo",
+            "festival",
+            "chokis",
+            "emperador",
+            "galleta"
+        ]
+    ):
+        return "SWEET_COOKIES"
+
+    if any(
+        x in n
+        for x in [
+            "pringles",
+            "doritos",
+            "takis",
+            "cheetos",
+            "tostitos"
+        ]
+    ):
+        return "SALTY_SNACKS"
+
+    if any(
+        x in n
+        for x in [
+            "croissant",
+            "muffin",
+            "brownie",
+            "bizcocho",
+            "cake"
+        ]
+    ):
+        return "SWEET_BAKERY"
+    
+    if any(
+        x in n
+        for x in [
+            "multigrano",
+            "multicereal",
+            "semillas",
+            "chia",
+            "avena",
+            "centeno",
+            "macadamia",
+            "masa madre",
+            "germen de trigo",
+            "brioche",
+            "mantequilla",
+            "papa"
+        ]
+    ):
+        return "SPECIALTY_BREAD"
+    
+    if (
+        "integral" in n
+        or "whole wheat" in n
+    ):
+        return "WHOLE_WHEAT_BREAD"
+
+    if (
+        "pan" in n
+        or "bread" in n
+        or "sandwich" in n
+        or "viga" in n
+    ):
+        return "WHITE_BREAD"
+    
+
+
+    return fallback
 
 # =====================================================
 # START
@@ -744,15 +884,17 @@ for categoria, terms in SEARCH_TERMS.items():
 
                 pres = extract_best_presentation(lineas)
 
-                if not es_categoria(nombre, terms) or es_exclusion(nombre):
-
-                    print("NO ES CATEGORIA:", nombre)
-
+                if es_exclusion(nombre):
                     continue
-    
+                    
                 marca = infer_brand(nombre)
                 
-                tipo = categoria
+                categoria_final = clasificar_categoria_comercial(
+                    nombre,
+                    categoria
+                )
+
+                tipo = categoria_final
     
                 weight_kg = extract_weight_kg(pres)
     
@@ -845,9 +987,9 @@ for categoria, terms in SEARCH_TERMS.items():
                             "currency": "DOP",
     
                             # Core fields
-                            "category": categoria,
+                            "category": categoria_final,
                             "source_category": categoria,
-                            "commercial_category": categoria,
+                            "commercial_category": categoria_final,
                             "retailer": retailer,
                             "brand": marca,
                             "product_name": nombre,
