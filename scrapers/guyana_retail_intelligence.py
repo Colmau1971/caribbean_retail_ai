@@ -25,6 +25,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 from search_dictionary import get_market_search_terms
+from brand_dictionary import infer_brand
 
 import undetected_chromedriver as uc
 
@@ -317,6 +318,39 @@ def extract_products_from_massy(driver, category: str, term: str):
         source_url=url,
         base_url=MASSY_BASE_URL
     )
+    # ==========================================
+    # MASSY FALSE SEARCH DETECTION
+    # ==========================================
+
+    if len(products) > 150:
+
+        first_names = [
+            str(p.get("product_name", "")).strip().lower()
+            for p in products[:10]
+        ]
+
+        category_markers = {
+            "grocery",
+            "baking needs",
+            "bread/cakes",
+            "canned products",
+            "canned meat",
+            "cereal",
+            "cold cereal",
+            "hot cereal",
+            "dairy & chilled products",
+            "pasta",
+        }
+
+        if any(name in category_markers for name in first_names):
+
+            print(
+                f"\nDESCARTANDO MASSY SEARCH: "
+                f"{term} devolvió catálogo/categorías "
+                f"({len(products)} registros)"
+            )
+
+            return []
 
     print(f"  Productos encontrados Massy: {len(products)}")
 
@@ -342,69 +376,52 @@ def get_soup_requests(url: str):
 def extract_products_from_francis_bounty(
     category: str,
     term: str,
-    max_pages: int = 3
+    max_pages: int = 1
 ):
-    all_products = []
+    url = build_francis_search_url(term, 1)
 
-    for page in range(1, max_pages + 1):
-        url = build_francis_search_url(term, page)
+    print(
+        f"Scraping Bounty/Francis: {category} | "
+        f"{term} | {url}"
+    )
 
+    try:
+        soup = get_soup_requests(url)
+
+    except Exception as e:
+        print(f"Error Francis/Bounty {url}: {e}")
+        return []
+
+    products = parse_product_cards(
+        soup=soup,
+        retailer="Bounty Supermarket / Francis de Gossiper",
+        source_category=category,
+        search_term=term,
+        source_url=url,
+        base_url="https://francisdegossiper.com"
+    )
+
+    filtered = [
+        p for p in products
+        if product_matches_terms(
+            p.get("product_name"),
+            [term]
+        )
+    ]
+
+    if not filtered:
         print(
-            f"Scraping Bounty/Francis: {category} | "
-            f"{term} | page {page} | {url}"
+            f"Descartando Bounty/Francis: "
+            f"{term} no tuvo productos relevantes"
         )
+        return []
 
-        try:
-            soup = get_soup_requests(url)
+    print(
+        f"  Productos encontrados Bounty/Francis: "
+        f"{len(filtered)}"
+    )
 
-        except Exception as e:
-            print(f"Error Francis/Bounty {url}: {e}")
-
-            if page == 1:
-                try:
-                    soup = get_soup_requests(FRANCIS_BOUNTY_URL)
-
-                except Exception as e2:
-                    print(f"Error fallback Francis/Bounty: {e2}")
-                    return []
-            else:
-                break
-
-        products = parse_product_cards(
-            soup=soup,
-            retailer="Bounty Supermarket / Francis de Gossiper",
-            source_category=category,
-            search_term=term,
-            source_url=url,
-            base_url="https://francisdegossiper.com"
-        )
-
-        category_terms = SEARCH_TERMS.get(category, [])
-
-        filtered = [
-            p for p in products
-            if product_matches_terms(
-                p.get("product_name"),
-                [term] + category_terms
-            )
-        ]
-
-        products = filtered if filtered else products
-
-        print(
-            f"  Productos encontrados Bounty/Francis: "
-            f"{len(products)}"
-        )
-
-        all_products.extend(products)
-
-        if not products:
-            break
-
-        time.sleep(random.uniform(1.2, 2.5))
-
-    return all_products
-
+    return filtered
 
 # =========================
 # PARSER GENÉRICO DE PRODUCTOS
@@ -549,9 +566,9 @@ def parse_product_cards(
 
 # =========================
 # NORMALIZACIÓN
-# =========================
+# ========================
 
-def infer_brand(product_name: str):
+
 
     if not product_name:
         return None
@@ -1328,7 +1345,7 @@ def main():
         r"^Beauty",
     ]
 
-    for pattern in INVALID_PATTERNS:
+    for pattern in INVALID_PATTERNS:    
 
         normalized_df = normalized_df[
             ~normalized_df["product_name"]
@@ -1340,7 +1357,44 @@ def main():
                 na=False
             )
         ]
+    NON_FOOD_KEYWORDS = [
+        "plastic wrap",
+        "film wrap",
+        "wrap set",
+        "grease proof paper",
+        "seal tape",
+        "shelf label",
+        "produce bags",
+        "vacuum bags",
+        "meat tray",
+        "meat trays",
+        "foil pan",
+        "cake pan",
+        "cake pans",
+        "cake dome",
+        "dome lid",
+        "hinged lid",
+        "clam shell",
+        "clamshell",
+        "container",
+        "containers",
+        "plastic bags",
+        "pan lid",
+        "scale labels",
+        "mousse",
+        "halls",
+    ]
 
+    normalized_df = normalized_df[
+        ~normalized_df["product_name"]
+        .astype(str)
+        .str.lower()
+        .str.contains(
+            "|".join(NON_FOOD_KEYWORDS),
+            regex=True,
+            na=False
+        )
+    ]
     print(
         f"Productos después limpieza Guyana: {len(normalized_df)}"
     )

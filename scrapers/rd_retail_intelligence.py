@@ -613,6 +613,22 @@ def es_exclusion(nombre):
         "pulpo",
         "mariscos",
         "alitas",
+        "carite",
+        "dorado",
+        "salmon",
+        "salmón",
+        "robalo",
+        "tenca",
+        "muslo",
+        "pavo",
+        "ternera",
+        "cordero",
+        "angus",
+        "brangus",
+        "yoyos",
+        "hilo para pasteles",
+        "papel para pasteles",
+        "papas congeladas",
     ]
 
     return any(x in n for x in exclusiones)

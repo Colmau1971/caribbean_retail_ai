@@ -1399,7 +1399,7 @@ def build_regional_dataset():
 
             missing_brands["dictionary_brand"] = (
                 missing_brands["product_name"]
-                .apply(infer_brand_from_dictionary)
+                .apply(lambda x: infer_brand({"product_name": x}))
             )
 
             missing_brands = missing_brands[
@@ -1410,13 +1410,47 @@ def build_regional_dataset():
                 .eq("other")
             ]
 
+            def extract_possible_brand(name):
+
+                if pd.isna(name):
+                    return "Unknown"
+
+                words = (
+                    str(name)
+                    .replace("-", " ")
+                    .strip()
+                    .split()
+                )
+
+                if not words:
+                    return "Unknown"
+
+                two_word_brands = {
+                    "Hungry Jack",
+                    "Mc Cain",
+                    "Bet Crock",
+                    "Food For",
+                    "Golden Harvest",
+                    "Morning Star",
+                    "Betty Crocker",
+                    "Two Bite",
+                    "Bobs Red",
+                }
+
+                candidate_2 = (
+                    " ".join(words[:2])
+                    .title()
+                )
+
+                if candidate_2 in two_word_brands:
+                    return candidate_2
+
+                return words[0].title()
+
+
             missing_brands["possible_brand"] = (
                 missing_brands["product_name"]
-                .astype(str)
-                .str.replace("-", " ", regex=False)
-                .str.split()
-                .str[0]
-                .str.title()
+                .apply(extract_possible_brand)
             )
 
             GENERIC_BRANDS = {
@@ -1435,8 +1469,25 @@ def build_regional_dataset():
                 "Molde", "Capacillos", "Leche",
                 "Paleta", "Milk", "Meat", "Soft",
                 "Each", "Flavoured", "Plastico",
+                "Ft", "Mc", "Bet", "Nv", "Hungry", "Food",
             }
-
+            GENERIC_BRANDS.update({
+                "Topper",
+                "Hamburguesa",
+                "Papel",
+                "Hilo",
+                "Servilletas",
+                "Papas",
+                "Pavo",
+                "Filete",
+                "Baguette",
+                "Casabe",
+                "Cheesecake",
+                "Cereal",
+                "Dulce",
+                "Palmeras",
+                "Variety",
+            })
             missing_summary = (
                 missing_brands
                 .groupby(
