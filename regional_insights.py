@@ -188,6 +188,54 @@ if match_col:
 else:
 
     same_sku_cross_country = pd.DataFrame()
+
+# =========================
+# 3C. REGIONAL BENCHMARK OPPORTUNITIES
+# =========================
+
+benchmark_opportunities = (
+    df[
+        df["benchmark_family_key"].notna()
+        & (df["benchmark_family_key"] != "exclude_from_benchmark")
+        & df["price_per_kg"].notna()
+        & (df["price_per_kg"] >= 1)
+        & (df["price_per_kg"] <= 80)
+    ]
+    .groupby("benchmark_family_key")
+    .agg(
+        countries=("country", "nunique"),
+        retailers=("retailer", "nunique"),
+        brand=("brand", "first"),
+        product_name=("product_name", "first"),
+        min_price_kg=("price_per_kg", "min"),
+        max_price_kg=("price_per_kg", "max"),
+        avg_price_kg=("price_per_kg", "mean"),
+    )
+    .reset_index()
+)
+
+benchmark_opportunities = benchmark_opportunities[
+    benchmark_opportunities["countries"] > 1
+].copy()
+
+benchmark_opportunities["gap_usd_kg"] = (
+    benchmark_opportunities["max_price_kg"]
+    - benchmark_opportunities["min_price_kg"]
+)
+
+benchmark_opportunities["gap_pct"] = np.where(
+    benchmark_opportunities["min_price_kg"] > 0,
+    (
+        benchmark_opportunities["gap_usd_kg"]
+        / benchmark_opportunities["min_price_kg"]
+    ) * 100,
+    np.nan
+)
+
+benchmark_opportunities = benchmark_opportunities.sort_values(
+    "gap_pct",
+    ascending=False
+)    
 # =========================
 # 4. OPORTUNIDADES PREMIUM
 # =========================
@@ -313,6 +361,7 @@ with pd.ExcelWriter(output_excel, engine="openpyxl") as writer:
     benchmark_bimbo.to_excel(writer, sheet_name="Benchmark Bimbo", index=False)
     alerts_df.to_excel(writer, sheet_name="Market Alerts", index=False)
     same_sku_cross_country.to_excel(writer, sheet_name="Same SKU Cross Country", index=False)
+    benchmark_opportunities.to_excel(writer, sheet_name="Regional Benchmark", index=False)
     
 print("\n===================================")
 print(" REGIONAL INSIGHTS FINISHED")
