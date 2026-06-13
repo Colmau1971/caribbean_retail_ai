@@ -120,7 +120,12 @@ def extract_weight_kg(text):
     )
 
     if oz_match:
-        return float(oz_match.group(1)) * 0.0283495
+        oz = float(oz_match.group(1))
+
+        if oz > 100:
+            oz = oz / 100
+
+        return oz * 0.0283495
 
     lb_match = re.search(
         r"(\d+(?:\.\d+)?)\s?(lb|lbs|pound|pounds)",
@@ -1095,12 +1100,14 @@ def safe_load_csv(path, country):
             errors="coerce"
         )
 
-        df["price_per_kg_usd"] = (
-            df["price_per_kg_usd"]
-            .fillna(
-                df["price_usd"] /
-                df["weight_kg"]
-            )
+        df.loc[
+            (df["price_usd"].notna())
+            & (df["weight_kg"].notna())
+            & (df["weight_kg"] > 0),
+            "price_per_kg_usd"
+        ] = (
+            df["price_usd"]
+            / df["weight_kg"]
         )
 
         # =========================
@@ -1750,44 +1757,7 @@ def build_regional_dataset():
 
         return f"{product}"
 
-        brand = normalize_sku_text(
-            row.get("brand", "")
-        )
-
-        name = normalize_sku_text(
-            row.get("product_name", "")
-        )
-
-        stopwords = {
-            "galleta", "galletas", "cookie", "cookies",
-            "cracker", "crackers", "sabor", "original",
-            "sandwich", "rellena", "relleno", "crema",
-            "pack", "paq", "mini", "regular", "classic",
-            "clasica", "clasico", "with", "and", "the",
-            "de", "con", "para", "und", "unidad",
-            "unidades"
-        }
-
-        tokens = [
-            t
-            for t in name.split()
-            if len(t) >= 4 and t not in stopwords
-        ]
-
-        tokens = sorted(set(tokens))
-
-        key_tokens = "_".join(
-            tokens[:4]
-        )
-
-        if not key_tokens:
-            key_tokens = "unknown"
-
-        if not brand:
-            brand = "unknown"
-
-        return f"{brand}_{key_tokens}"
-
+     
     # ==================================================
     # FAMILY KEYS
     # ==================================================
@@ -1811,6 +1781,92 @@ def build_regional_dataset():
     regional_df["family_key"] = (
         regional_df["commercial_family_key"]
     )
+        # ==================================================
+    # BENCHMARK FAMILY KEY
+    # More strict key for price gap analysis
+    # ==================================================
+
+    def benchmark_family_key(row):
+
+        brand = normalize_sku_text(
+            row.get("brand", "")
+        )
+
+        product = normalize_sku_text(
+            row.get("product_name", "")
+        )
+
+        category = str(
+            row.get("commercial_category", "")
+        ).lower()
+
+        if not brand:
+            brand = "unknown"
+
+        text = f"{brand} {product} {category}"
+
+        # Ritz cleanup
+        if "ritz" in text:
+
+            if "spritz" in text or "spritzer" in text:
+                return "exclude_from_benchmark"
+
+            if "chips" in text or "crisp" in text or "thin" in text or "toasted" in text:
+                return f"{brand}_ritz_chips"
+
+            if "bits" in text:
+                return f"{brand}_ritz_bits"
+
+            if "sandwich" in text or "peanut" in text:
+                return f"{brand}_ritz_sandwich"
+
+            if "queso" in text or "cheese" in text or "cheddar" in text:
+                return f"{brand}_ritz_cheese"
+
+            return f"{brand}_ritz_crackers"
+
+        # Oreo cleanup
+        if "oreo" in text:
+
+            if "vanilla" in text or "vainilla" in text or "golden" in text:
+                return f"{brand}_oreo_vanilla"
+
+            if "chocolate" in text or "choco" in text:
+                return f"{brand}_oreo_chocolate"
+
+            if "thin" in text:
+                return f"{brand}_oreo_thins"
+
+            return f"{brand}_oreo_original"
+
+        # Hot dog buns only, not meat hot dogs
+        if category == "hotdog_buns":
+
+            if any(x in product for x in [
+                "gwaltney",
+                "ball park",
+                "beef",
+                "chicken",
+                "sausage",
+                "meat",
+                "angus"
+            ]):
+                return "exclude_from_benchmark"
+
+            return f"{brand}_hotdog_buns"
+        
+        # Hamburger buns
+        if category == "hamburger_buns":
+            return f"{brand}_hamburger_buns"
+
+        return f"{brand}_{row.get('commercial_family_key', 'unknown')}"
+    
+    regional_df["benchmark_family_key"] = (
+    regional_df.apply(
+        benchmark_family_key,
+        axis=1
+    )
+)
 
     # ==================================================
     # COMMERCIAL CATEGORY
@@ -1851,29 +1907,64 @@ def build_regional_dataset():
         regional_df[
             regional_df["commercial_overlap"] > 1
         ]
-        .groupby("family_key")
+    .groupby(
+        [
+            "benchmark_family_key"
+        ]
+    )
         .agg(
             countries=("country", "nunique"),
             retailers=("retailer", "nunique"),
-            min_price_usd=("price_usd", "min"),
-            max_price_usd=("price_usd", "max"),
-            avg_price_usd=("price_usd", "mean"),
+            min_price_per_kg_usd=("price_per_kg_usd", "min"),
+            max_price_per_kg_usd=("price_per_kg_usd", "max"),
+            avg_price_per_kg_usd=("price_per_kg_usd", "mean"),
             product_name=("product_name", "first"),
+            presentations=("presentation", "nunique"),
+        )
+        .reset_index()
+            )
+
+    regional_price_gap = (
+        regional_df[
+            (regional_df["commercial_overlap"] > 1)
+            & (regional_df["price_per_kg_usd"].notna())
+            & (regional_df["price_per_kg_usd"] > 0)
+            & (regional_df["price_per_kg_usd"] >= 1)
+            & (regional_df["price_per_kg_usd"] <= 80)
+            & (~regional_df["product_name"].astype(str).str.contains(
+                "gwaltney|ball park|beef hot dogs|chicken original bun size",
+                case=False,
+                na=False
+            ))
+            & (
+                regional_df["benchmark_family_key"]
+                != "exclude_from_benchmark"
+            )
+        ]
+        .groupby("benchmark_family_key")
+        .agg(
             brand=("brand", "first"),
+            product_name=("product_name", "first"),
+            countries=("country", "nunique"),
+            retailers=("retailer", "nunique"),
+            min_price_per_kg_usd=("price_per_kg_usd", "min"),
+            max_price_per_kg_usd=("price_per_kg_usd", "max"),
+            avg_price_per_kg_usd=("price_per_kg_usd", "mean"),
+            presentations=("presentation", "nunique"),
         )
         .reset_index()
     )
 
-    regional_price_gap["price_gap_usd"] = (
-        regional_price_gap["max_price_usd"]
-        - regional_price_gap["min_price_usd"]
+    regional_price_gap["price_gap_per_kg_usd"] = (
+        regional_price_gap["max_price_per_kg_usd"]
+        - regional_price_gap["min_price_per_kg_usd"]
     )
 
     regional_price_gap["price_gap_pct"] = np.where(
-        regional_price_gap["min_price_usd"] > 0,
+        regional_price_gap["min_price_per_kg_usd"] > 0,
         (
-            regional_price_gap["price_gap_usd"]
-            / regional_price_gap["min_price_usd"]
+            regional_price_gap["price_gap_per_kg_usd"]
+            / regional_price_gap["min_price_per_kg_usd"]
         ) * 100,
         np.nan
     )
@@ -1954,8 +2045,8 @@ def build_regional_dataset():
                     "brand",
                     "product_name",
                     "countries",
-                    "min_price_usd",
-                    "max_price_usd",
+                    "min_price_per_kg_usd",
+                    "max_price_per_kg_usd",
                     "price_gap_pct"
                 ]
             ]
@@ -2017,17 +2108,6 @@ def export_regional_files(
         engine="xlsxwriter"
     ) as writer:
 
-        df.to_excel(
-            writer,
-            sheet_name="Regional Master",
-            index=False
-        )
-
-        regional_price_gap.to_excel(
-            writer,
-            sheet_name="SKU Price Gaps",
-            index=False
-        )
         df.to_excel(
             writer,
             sheet_name="Regional Master",
