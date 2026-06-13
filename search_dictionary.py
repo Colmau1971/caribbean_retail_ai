@@ -107,7 +107,7 @@ SEARCH_DICTIONARY = {
 
     "TOASTED_BREAD": {
         "Dominican Republic": [
-            "tostadas"
+            "Pan Tostado"
         ],
         "Guyana": [
             "melba toast"
