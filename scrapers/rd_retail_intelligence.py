@@ -629,6 +629,14 @@ def es_exclusion(nombre):
         "hilo para pasteles",
         "papel para pasteles",
         "papas congeladas",
+        "pollo congelado",
+        "pavo congelado",
+        "patas de res",
+        "patas de cerdo",
+        "pulpo",
+        "robalo",
+        "salmón",
+        "dorado"
     ]
 
     return any(x in n for x in exclusiones)
