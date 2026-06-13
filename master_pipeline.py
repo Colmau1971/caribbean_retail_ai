@@ -1387,7 +1387,7 @@ def build_regional_dataset():
     )
 
     print("Brand groups normalized.")
-       # ==========================================
+    # ==========================================
     # BRAND NORMALIZATION ENGINE
     # Missing brands backlog
     # ==========================================
@@ -1781,7 +1781,13 @@ def build_regional_dataset():
     regional_df["family_key"] = (
         regional_df["commercial_family_key"]
     )
-        # ==================================================
+    regional_df["commercial_category"] = (
+    regional_df.apply(
+        classify_commercial_category,
+        axis=1
+    )
+)
+    # ==================================================
     # BENCHMARK FAMILY KEY
     # More strict key for price gap analysis
     # ==================================================
@@ -1872,12 +1878,7 @@ def build_regional_dataset():
     # COMMERCIAL CATEGORY
     # ==================================================
 
-    regional_df["commercial_category"] = (
-        regional_df.apply(
-            classify_commercial_category,
-            axis=1
-        )
-    )
+
     regional_df["commercial_overlap"] = (
         regional_df.groupby("commercial_family_key")["country"]
         .transform("nunique")
