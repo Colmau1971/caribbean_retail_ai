@@ -1661,7 +1661,25 @@ def build_regional_dataset():
     regional_df["barcode_harmonized"] = (
         regional_df["barcode_12"]
     )
-    
+        # ==========================================
+    # FAKE / REUSED BARCODES BLACKLIST
+    # ==========================================
+
+    FAKE_BARCODES = {
+        "753081009133",
+        "255250000000",
+        "254005000000",
+        "810023430087",
+        "254072000000",
+        "254151000000",
+    }
+
+    regional_df.loc[
+        regional_df["barcode_harmonized"]
+        .astype(str)
+        .isin(FAKE_BARCODES),
+        "barcode_harmonized"
+    ] = pd.NA
     # ==================================================
     # FAMILY MATCHING ENGINE
     # Commercial engine is calculated below
