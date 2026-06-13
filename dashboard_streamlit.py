@@ -1072,7 +1072,85 @@ retailer_view = (
 )
 
 st.dataframe(retailer_view, width="stretch")
+# ==============================
+# REGIONAL BENCHMARK
+# ==============================
 
+st.subheader("🎯 Regional Benchmark Opportunities")
+
+benchmark_path = Path(
+    "streamlit_data/regional_insights.xlsx"
+)
+
+if benchmark_path.exists():
+
+    try:
+
+        benchmark_df = pd.read_excel(
+            benchmark_path,
+            sheet_name="Regional Benchmark"
+        )
+
+        if not benchmark_df.empty:
+
+            b1, b2, b3 = st.columns(3)
+
+            b1.metric(
+                "Benchmark Families",
+                len(benchmark_df)
+            )
+
+            b2.metric(
+                "Avg Gap %",
+                f"{benchmark_df['price_gap_pct'].mean():.1f}%"
+            )
+
+            b3.metric(
+                "Max Gap %",
+                f"{benchmark_df['price_gap_pct'].max():.1f}%"
+            )
+
+            fig = px.bar(
+                benchmark_df.head(20),
+                x="price_gap_pct",
+                y="product_name",
+                color="brand",
+                orientation="h",
+                title="Top Regional Benchmark Opportunities"
+            )
+
+            fig.update_layout(
+                yaxis={
+                    "categoryorder":
+                    "total ascending"
+                }
+            )
+
+            st.plotly_chart(
+                fig,
+                width="stretch"
+            )
+
+            st.dataframe(
+                benchmark_df,
+                width="stretch"
+            )
+
+        else:
+            st.info(
+                "Regional Benchmark vacío."
+            )
+
+    except Exception as e:
+        st.error(
+            f"Error Benchmark: {e}"
+        )
+
+else:
+
+    st.info(
+        "No existe regional_insights.xlsx"
+    )
 # ==============================
 # RAW DATA
 # ==============================
