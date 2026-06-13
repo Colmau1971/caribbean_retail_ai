@@ -1102,17 +1102,17 @@ if benchmark_path.exists():
 
             b2.metric(
                 "Avg Gap %",
-                f"{benchmark_df['price_gap_pct'].mean():.1f}%"
+                f"{benchmark_df['gap_pct'].mean():.1f}%"
             )
 
             b3.metric(
                 "Max Gap %",
-                f"{benchmark_df['price_gap_pct'].max():.1f}%"
+                f"{benchmark_df['gap_pct'].max():.1f}%"
             )
 
             fig = px.bar(
                 benchmark_df.head(20),
-                x="price_gap_pct",
+                x="gap_pct",
                 y="product_name",
                 color="brand",
                 orientation="h",
