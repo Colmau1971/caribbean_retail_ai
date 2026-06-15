@@ -1,19 +1,18 @@
 """
 DOIT ARUBA RETAIL INTELLIGENCE
-FINAL VERSION + BARCODE / UPC / GTIN
+API ODATA VERSION
 
 Uso:
 python scrapers/doit_aruba_intelligence.py
 """
 
-
 import re
 import time
+import base64
 import requests
 import pandas as pd
 import sys
 
-from bs4 import BeautifulSoup
 from pathlib import Path
 from datetime import datetime
 
@@ -23,6 +22,8 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.append(str(ROOT_DIR))
 
 from brand_dictionary import infer_brand
+from search_dictionary import get_market_search_terms
+
 
 # =========================================================
 # CONFIG
@@ -38,109 +39,47 @@ LMSTUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M")
 
-BASE_URL = "https://doit.aw"
-RETAILER = "DOIT Aruba"
 COUNTRY = "Aruba"
+RETAILER = "DOIT Aruba"
 
-USD_TO_AWG = 1.79
+AWG_TO_USD = 1 / 1.79
+
+BASE_URL = (
+    "https://general.doit.aw:8048/APP/ODataV4/"
+    "Company('Doit%20Center')/AppItemList"
+)
+
+AUTH_USER = "WEBAPI"
+AUTH_PASS = "SSjvDC9FijvuYLlEp6w4UzHb9VTOAjCA+DWeHTcocjw="
+
+AUTH_TOKEN = base64.b64encode(
+    f"{AUTH_USER}:{AUTH_PASS}".encode()
+).decode()
 
 HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/148.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
+    "Authorization": f"Basic {AUTH_TOKEN}",
+    "User-Agent": "Mozilla/5.0",
+    "Accept": "application/json",
 }
 
-SEARCH_TERMS = {
-    "Bakery": [
-        "bread",
-        "bun",
-        "bagel",
-        "roll"
-    ],
-
-    "Tortillas & Wraps": [
-        "tortilla",
-        "wrap",
-        "flatbread"
-    ],
-
-    "Cookies & Crackers": [
-        "cookies",
-        "crackers",
-        "wafer"
-    ],
-
-    "Snacks": [
-        "chips",
-        "snacks",
-        "pretzels"
-    ],
-
-    "Frozen Bakery": [
-        "frozen bread",
-        "frozen dough",
-        "frozen pizza"
-    ]
-}
+SEARCH_TERMS = get_market_search_terms("Aruba")
 
 
 # =========================================================
 # HELPERS
 # =========================================================
 
-def build_search_url(keyword):
-    return (
-        f"{BASE_URL}/search/"
-        f"?keyword={keyword.replace(' ', '+')}&CloseOut=null"
-    )
-
-
-def extract_price(text):
+def clean_product_name(text):
     if not text:
         return None
 
-    patterns = [
-        r"\$\s*([0-9]+(?:\.[0-9]+)?)",
-        r"USD\s*([0-9]+(?:\.[0-9]+)?)",
-        r"AWG\s*([0-9]+(?:\.[0-9]+)?)",
-        r"Afl\.?\s*([0-9]+(?:\.[0-9]+)?)",
-    ]
+    text = str(text)
+    text = re.sub(r"\s+", " ", text).strip()
 
-    for pattern in patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            return float(match.group(1))
+    if len(text) > 180:
+        text = text[:180]
 
-    return None
-
-
-def extract_barcode(text):
-    if not text:
-        return None
-
-    patterns = [
-        r'"gtin13"\s*:\s*"?(\d+)"?',
-        r'"gtin12"\s*:\s*"?(\d+)"?',
-        r'"gtin14"\s*:\s*"?(\d+)"?',
-        r'"gtin"\s*:\s*"?(\d+)"?',
-        r'"ean"\s*:\s*"?(\d+)"?',
-        r'"upc"\s*:\s*"?(\d+)"?',
-        r'"barcode"\s*:\s*"?(\d+)"?',
-        r'"sku"\s*:\s*"?(\d{8,14})"?',
-        r'\b(\d{12})\b',
-        r'\b(\d{13})\b',
-        r'\b(\d{14})\b',
-    ]
-
-    for pattern in patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            return str(match.group(1))
-
-    return None
+    return text
 
 
 def normalize_barcode(value):
@@ -148,8 +87,9 @@ def normalize_barcode(value):
         return None
 
     value = str(value).strip().replace(".0", "")
+    value = re.sub(r"[^0-9]", "", value)
 
-    if not value.isdigit():
+    if not value:
         return None
 
     if len(value) == 11:
@@ -158,7 +98,25 @@ def normalize_barcode(value):
     if len(value) in [12, 13, 14]:
         return value
 
-    return value
+    return None
+
+
+def convert_to_kg(value, unit):
+    unit = unit.lower()
+
+    if unit == "kg":
+        return value
+
+    if unit in ["g", "gr"]:
+        return value / 1000
+
+    if unit == "oz":
+        return value * 0.0283495
+
+    if unit in ["lb", "lbs"]:
+        return value * 0.453592
+
+    return None
 
 
 def estimate_weight_kg(name):
@@ -176,60 +134,54 @@ def estimate_weight_kg(name):
         qty = float(multi.group(1))
         value = float(multi.group(2))
         unit = multi.group(3)
-        return convert_to_kg(qty * value, unit)
+        return round(convert_to_kg(qty * value, unit), 3)
 
     patterns = [
-        (r"(\d+(?:\.\d+)?)\s?kg", 1),
-        (r"(\d+(?:\.\d+)?)\s?g", 0.001),
-        (r"(\d+(?:\.\d+)?)\s?gr", 0.001),
-        (r"(\d+(?:\.\d+)?)\s?oz", 0.0283495),
-        (r"(\d+(?:\.\d+)?)\s?lb", 0.453592),
-        (r"(\d+(?:\.\d+)?)\s?lbs", 0.453592),
+        (r"(\d+(?:\.\d+)?)\s?kg", "kg"),
+        (r"(\d+(?:\.\d+)?)\s?g\b", "g"),
+        (r"(\d+(?:\.\d+)?)\s?gr\b", "gr"),
+        (r"(\d+(?:\.\d+)?)\s?oz\b", "oz"),
+        (r"(\d+(?:\.\d+)?)\s?lb\b", "lb"),
+        (r"(\d+(?:\.\d+)?)\s?lbs\b", "lbs"),
     ]
 
-    for pattern, factor in patterns:
+    for pattern, unit in patterns:
         match = re.search(pattern, text)
 
         if match:
-            return round(float(match.group(1)) * factor, 3)
+            return round(
+                convert_to_kg(float(match.group(1)), unit),
+                3
+            )
 
     return None
 
 
-def convert_to_kg(value, unit):
-    unit = unit.lower()
+def classify_category(name, source_category):
+    if not name:
+        return source_category
 
-    if unit == "kg":
-        return value
-    if unit in ["g", "gr"]:
-        return value / 1000
-    if unit == "oz":
-        return value * 0.0283495
-    if unit in ["lb", "lbs"]:
-        return value * 0.453592
+    n = name.lower()
 
-    return None
+    if any(x in n for x in ["tortilla", "wrap", "flatbread"]):
+        return "Tortillas & Wraps"
 
+    if any(x in n for x in ["bread", "bun", "roll", "bagel", "loaf"]):
+        return "Bakery"
 
-def estimate_brand(name):
-    if not isinstance(name, str) or not name.strip():
-        return "Unknown"
+    if any(x in n for x in ["cookie", "biscuit", "wafer", "oreo"]):
+        return "Cookies"
 
-    known = [
-        "Oreo", "Nabisco", "Ritz", "Mission", "Toufayan", "Bimbo",
-        "Tia Rosa", "Sara Lee", "Wonder", "Nature Valley", "Pringles",
-        "Doritos", "Lays", "Lay's", "Quaker", "Pepperidge", "Thomas",
-        "Entenmann", "Old El Paso", "McVitie", "Kellogg", "Belvita",
-        "Goldfish", "Stacy's", "Jumbo"
-    ]
+    if any(x in n for x in ["cracker", "ritz"]):
+        return "Crackers"
 
-    lower = name.lower()
+    if any(x in n for x in ["chips", "snack", "popcorn", "pretzel", "pringles", "doritos"]):
+        return "Snacks"
 
-    for brand in known:
-        if brand.lower() in lower:
-            return brand
+    if any(x in n for x in ["frozen", "dough", "pizza"]):
+        return "Frozen Bakery"
 
-    return name.split()[0]
+    return source_category
 
 
 def segment_product(price_usd):
@@ -248,200 +200,117 @@ def segment_product(price_usd):
     return "Super Premium"
 
 
-def clean_product_name(text):
-    if not text:
-        return None
+def safe_brand(api_brand, product_name):
+    if api_brand and str(api_brand).strip():
+        return str(api_brand).strip()
 
-    text = re.sub(r"\s+", " ", text).strip()
+    detected = infer_brand(product_name)
 
-    cleanup_terms = [
-        "Add to cart",
-        "Add To Cart",
-        "View product",
-        "Quick view",
-        "In stock",
-        "Out of stock",
-    ]
+    if detected:
+        return detected
 
-    for term in cleanup_terms:
-        text = text.replace(term, "")
-
-    text = text.strip()
-
-    if len(text) > 180:
-        text = text[:180]
-
-    return text
+    return "Unknown"
 
 
-def classify_category(name, source_category):
-    if not name:
-        return source_category
-
-    n = name.lower()
-
-    if any(x in n for x in ["tortilla", "wrap", "flatbread"]):
-        return "Tortillas & Wraps"
-
-    if any(x in n for x in ["bread", "bun", "roll", "bagel", "loaf"]):
-        return "Bakery"
-
-    if any(x in n for x in ["cookie", "biscuit", "wafer"]):
-        return "Cookies"
-
-    if "cracker" in n:
-        return "Crackers"
-
-    if any(x in n for x in ["chips", "snack", "popcorn", "pretzel"]):
-        return "Snacks"
-
-    if any(x in n for x in ["frozen", "dough", "pizza"]):
-        return "Frozen Bakery"
-
-    return source_category
+def escape_odata_text(value):
+    return str(value).replace("'", "''")
 
 
-def get_product_url(card, search_url):
-    link = card.select_one("a[href]")
+# =========================================================
+# API SCRAPER
+# =========================================================
 
-    if not link:
-        return search_url
+def fetch_odata_products(keyword, top=100):
+    keyword = escape_odata_text(keyword)
 
-    href = link.get("href")
+    params = {
+        "$top": top,
+        "$filter": (
+            f"contains(Description,'{keyword}') "
+            "and ShowonWebsite eq true"
+        ),
+    }
 
-    if not href:
-        return search_url
-
-    return urljoin(BASE_URL, href)
-
-
-def extract_product_name_from_card(card, text):
-    selectors = [
-        ".product-title",
-        ".product-name",
-        ".title",
-        "h2",
-        "h3",
-        "h4",
-        "a[href]"
-    ]
-
-    for selector in selectors:
-        el = card.select_one(selector)
-        if el:
-            name = el.get_text(" ", strip=True)
-            if name and len(name) > 2:
-                return clean_product_name(name)
-
-    # fallback: remueve precio del texto
-    text = re.sub(r"\$\s*[0-9]+(?:\.[0-9]+)?", "", text)
-    return clean_product_name(text)
-
-
-def get_html(url):
     response = requests.get(
-        url,
+        BASE_URL,
+        params=params,
         headers=HEADERS,
-        timeout=30
+        timeout=45,
     )
+
     response.raise_for_status()
-    return response.text
 
+    data = response.json()
 
-def extract_barcode_from_product_page(product_url):
-    if not product_url or product_url == BASE_URL:
-        return None
+    return data.get("value", [])
 
-    try:
-        html = get_html(product_url)
-        return normalize_barcode(extract_barcode(html))
-    except Exception:
-        return None
-
-
-# =========================================================
-# SCRAPER
-# =========================================================
 
 def scrape_search(category, keyword):
-    url = build_search_url(keyword)
-
-    print(f"Scraping DOIT Aruba | {category} | {keyword} | {url}")
+    print(
+        f"Scraping DOIT Aruba | {category} | {keyword}"
+    )
 
     try:
-        html = get_html(url)
+        items = fetch_odata_products(keyword)
     except Exception as e:
-        print(f"ERROR URL: {e}")
+        print(f"ERROR API DOIT | {keyword}: {e}")
         return []
-
-    soup = BeautifulSoup(html, "html.parser")
-
-    cards = (
-        soup.select(".product")
-        or soup.select(".product-card")
-        or soup.select(".product-item")
-        or soup.select("[class*='product']")
-        or soup.select("a[href*='product']")
-        or soup.find_all("div")
-    )
 
     products = []
     seen = set()
-    found = 0
 
-    for card in cards:
-        text = card.get_text(" ", strip=True)
+    for item in items:
+        name = clean_product_name(
+            item.get("Description")
+        )
 
-        if not text:
+        if not name:
             continue
 
-        if "$" not in text and "AWG" not in text and "Afl" not in text:
+        price_awg = item.get("LSC_Unit_Price_Incl_VAT")
+
+        try:
+            price_awg = float(price_awg)
+        except Exception:
             continue
 
-        price = extract_price(text)
-
-        if not price:
-            continue
-
-        product_url = get_product_url(card, url)
-
-        name = extract_product_name_from_card(card, text)
-
-        if not name or len(name) < 3:
-            continue
-
-        if any(
-            bad in name.lower()
-            for bad in [
-                "search",
-                "cart",
-                "login",
-                "wishlist",
-                "checkout",
-                "navigation"
-            ]
-        ):
+        if price_awg <= 0:
             continue
 
         barcode = normalize_barcode(
-            extract_barcode(str(card))
+            item.get("No")
         )
-
-        if not barcode and product_url != url:
-            barcode = extract_barcode_from_product_page(product_url)
 
         weight_kg = estimate_weight_kg(name)
 
-        price_per_kg = None
+        price_usd = round(
+            price_awg * AWG_TO_USD,
+            2
+        )
+
+        price_per_kg_usd = None
 
         if weight_kg and weight_kg > 0:
-            price_per_kg = round(price / weight_kg, 2)
+            price_per_kg_usd = round(
+                price_usd / weight_kg,
+                2
+            )
+
+        brand = safe_brand(
+            item.get("LSC_Attrib_1_Code"),
+            name
+        )
+
+        product_url = (
+            "https://doit.aw/search/?keyword="
+            + keyword.replace(" ", "+")
+        )
 
         key = (
             RETAILER,
             name,
-            price,
-            product_url
+            price_awg,
+            barcode
         )
 
         if key in seen:
@@ -449,35 +318,45 @@ def scrape_search(category, keyword):
 
         seen.add(key)
 
-        product = {
-            "scrape_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "country": COUNTRY,
-            "retailer": RETAILER,
-            "category": classify_category(name, category),
-            "source_category": keyword,
-            "brand": estimate_brand(name),
-            "product_name": name,
-            "barcode": barcode,
-            "barcode_length": len(barcode) if barcode else None,
-            "price_awg": round(price * USD_TO_AWG, 2),
-            "price_local": round(price * USD_TO_AWG, 2),
-            "currency": "AWG",
-            "price_usd": round(price, 2),
-            "weight_kg": weight_kg,
-            "price_per_kg_usd": price_per_kg,
-            "segment": segment_product(price),
-            "product_url": product_url,
-            "source_url": url,
-        }
+        products.append(
+            {
+                "scrape_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "country": COUNTRY,
+                "retailer": RETAILER,
+                "category": classify_category(name, category),
+                "source_category": category,
+                "search_term": keyword,
+                "brand": brand,
+                "product_name": name,
+                "barcode": barcode,
+                "barcode_length": len(barcode) if barcode else None,
+                "price_awg": round(price_awg, 2),
+                "price_local": round(price_awg, 2),
+                "currency": "AWG",
+                "price_usd": price_usd,
+                "presentation": item.get("Sales_Unit_of_Measure"),
+                "weight_kg": weight_kg,
+                "price_per_kg_usd": price_per_kg_usd,
+                "segment": segment_product(price_usd),
+                "product_url": product_url,
+                "source_url": BASE_URL,
+                "item_no": item.get("No"),
+                "division_code": item.get("LSC_Division_Code"),
+                "item_category_code": item.get("Item_Category_Code"),
+                "retail_product_code": item.get("LSC_Retail_Product_Code"),
+                "on_hand_qty": item.get("OnHandQty"),
+                "show_on_website": item.get("ShowonWebsite"),
+            }
+        )
 
-        products.append(product)
-
-        found += 1
-
-    print(f"  Productos encontrados: {found}")
+    print(f"  Productos encontrados: {len(products)}")
 
     return products
 
+
+# =========================================================
+# MAIN
+# =========================================================
 
 def main():
     all_products = []
@@ -493,22 +372,26 @@ def main():
 
             all_products.extend(products)
 
-            time.sleep(2)
+            time.sleep(1)
 
     df = pd.DataFrame(all_products)
 
     if not df.empty:
 
-        if "barcode" in df.columns:
-            df["barcode"] = df["barcode"].apply(normalize_barcode)
-            df["barcode_length"] = df["barcode"].astype("string").str.len()
+        df["barcode"] = df["barcode"].apply(normalize_barcode)
+
+        df["barcode_length"] = (
+            df["barcode"]
+            .astype("string")
+            .str.len()
+        )
 
         df = df.drop_duplicates(
             subset=[
                 "retailer",
                 "product_name",
                 "price_usd",
-                "product_url"
+                "barcode",
             ]
         )
 
@@ -532,6 +415,16 @@ def main():
         f"doit_aruba_retail_intelligence_{TIMESTAMP}.csv"
     )
 
+    latest_csv_path = (
+        OUTPUT_DIR /
+        "doit_aruba_retail_intelligence_latest.csv"
+    )
+
+    latest_excel_path = (
+        OUTPUT_DIR /
+        "doit_aruba_retail_intelligence_latest.xlsx"
+    )
+
     txt_path = (
         LMSTUDIO_DIR /
         f"doit_aruba_products_rag_{TIMESTAMP}.txt"
@@ -543,7 +436,10 @@ def main():
     )
 
     df.to_excel(excel_path, index=False)
+    df.to_excel(latest_excel_path, index=False)
+
     df.to_csv(csv_path, index=False, encoding="utf-8-sig")
+    df.to_csv(latest_csv_path, index=False, encoding="utf-8-sig")
 
     with open(txt_path, "w", encoding="utf-8") as f:
 
@@ -571,6 +467,8 @@ def main():
 
     print(f"Excel: {excel_path}")
     print(f"CSV: {csv_path}")
+    print(f"Latest Excel: {latest_excel_path}")
+    print(f"Latest CSV: {latest_csv_path}")
     print(f"TXT: {txt_path}")
     print(f"JSONL: {jsonl_path}")
 

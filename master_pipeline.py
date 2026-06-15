@@ -1211,16 +1211,15 @@ def build_regional_dataset():
     datasets = []
 
     sources = [
-        ("Dominican Republic", OUTPUT_RD),
-        ("Guyana", OUTPUT_GUYANA),
-        ("Aruba", OUTPUT_ARUBA),
+        ("Dominican Republic", OUTPUT_RD / "benchmark_rd_master.csv"),
+        ("Guyana", OUTPUT_GUYANA / "guyana_master_clean_latest.csv"),
+        ("Aruba", OUTPUT_ARUBA / "superfood_aruba_retail_intelligence_latest.csv"),
+        ("Aruba", OUTPUT_ARUBA / "doit_aruba_retail_intelligence_latest.csv"),
     ]
 
-    for country, folder in sources:
+    for country, csv_file in sources:
 
-        csv_file = latest_csv(folder)
-
-        if csv_file:
+        if csv_file.exists():
 
             df_country = safe_load_csv(
                 csv_file,
@@ -1234,7 +1233,7 @@ def build_regional_dataset():
 
             print(
                 f"WARNING: no CSV found for "
-                f"{country}"
+                f"{country}: {csv_file}"
             )
 
     if not datasets:
@@ -2273,7 +2272,25 @@ def main():
         OUTPUT_ARUBA /
         "superfood_aruba_retail_intelligence_latest.csv"
     )
+    # ==========================================
+    # ARUBA - DOIT
+    # ==========================================
 
+    doit_master_file = (
+        OUTPUT_ARUBA /
+        "doit_aruba_retail_intelligence_latest.csv"
+    )
+
+    if not FORCE_SCRAPE and is_file_modified_today(
+        doit_master_file
+    ):
+        print("DOIT Aruba ya tiene archivo maestro actualizado hoy. Se omite scraper DOIT.")
+
+    else:
+        run_script(
+            BASE_DIR / "scrapers/doit_aruba_intelligence.py",
+            "DOIT ARUBA SCRAPER"
+        )
     if not FORCE_SCRAPE and is_file_modified_today(
         aruba_master_file
     ):
@@ -2285,7 +2302,22 @@ def main():
             BASE_DIR / "scrapers/superfood_aruba_intelligence.py",
             "ARUBA SCRAPER"
         )
+    doit_aruba_file = (
+        OUTPUT_ARUBA /
+        "doit_aruba_retail_intelligence_latest.csv"
+    )
 
+    if not FORCE_SCRAPE and is_file_modified_today(
+        doit_aruba_file
+    ):
+        print("DOIT Aruba ya tiene archivo maestro actualizado hoy. Se omite scraper DOIT Aruba.")
+
+    else:
+
+        run_script(
+            BASE_DIR / "scrapers/doit_aruba_intelligence.py",
+            "DOIT ARUBA SCRAPER"
+        )
     print("\n===================================")
     print(" CARIBBEAN RETAIL INTELLIGENCE AI")
     print("===================================\n")
