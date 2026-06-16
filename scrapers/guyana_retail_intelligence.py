@@ -73,11 +73,11 @@ def build_massy_search_url(term: str) -> str:
 
 
 def build_francis_search_url(term: str, page: int = 1) -> str:
-    if page <= 1:
-        return (
-            f"{FRANCIS_BOUNTY_URL}?s={term.replace(' ', '+')}"
-            f"&post_type=product"
-        )
+    return (
+        "https://francisdegossiper.com/"
+        f"?s={term.replace(' ', '+')}"
+        "&post_type=product"
+    )
 
     return (
         f"{FRANCIS_BOUNTY_URL}page/{page}/"
@@ -372,53 +372,55 @@ def get_soup_requests(url: str):
 
     return BeautifulSoup(response.text, "lxml")
 
-
 def extract_products_from_francis_bounty(
-    category: str,
-    term: str,
-    max_pages: int = 1
+    driver,
+    category,
+    term,
+    max_pages=1
 ):
+
     url = build_francis_search_url(term, 1)
 
     print(
-        f"Scraping Bounty/Francis: {category} | "
-        f"{term} | {url}"
+        f"Scraping Bounty/Francis: "
+        f"{category} | {term}"
     )
 
     try:
-        soup = get_soup_requests(url)
+
+        driver.get(url)
+
+        time.sleep(8)
+
+        html = driver.page_source
+
+        soup = BeautifulSoup(
+            html,
+            "lxml"
+        )
 
     except Exception as e:
-        print(f"Error Francis/Bounty {url}: {e}")
+
+        print(
+            f"Error Francis/Bounty {url}: {e}"
+        )
+
         return []
 
     products = parse_product_cards(
         soup=soup,
-        retailer="Bounty Supermarket / Francis de Gossiper",
+        retailer="Bounty Supermarket",
         source_category=category,
         search_term=term,
         source_url=url,
         base_url="https://francisdegossiper.com"
     )
 
-    filtered = [
-        p for p in products
-        if product_matches_terms(
-            p.get("product_name"),
-            [term]
-        )
-    ]
-
-    if not filtered:
-        print(
-            f"Descartando Bounty/Francis: "
-            f"{term} no tuvo productos relevantes"
-        )
-        return []
+    filtered = products
 
     print(
-        f"  Productos encontrados Bounty/Francis: "
-        f"{len(filtered)}"
+        f"  Productos encontrados Bounty RAW: "
+        f"{len(products)}"
     )
 
     return filtered
@@ -1265,6 +1267,10 @@ def export_excel(raw_df, normalized_df, summary_df, alerts_df):
 def main():
     all_products = []
 
+    # =========================
+    # MASSY
+    # =========================
+
     driver = start_driver()
 
     try:
@@ -1283,17 +1289,28 @@ def main():
     finally:
         driver.quit()
 
-    for category, terms in SEARCH_TERMS.items():
-        for term in terms:
-            products = extract_products_from_francis_bounty(
-                category,
-                term,
-                max_pages=3
-            )
+    # =========================
+    # BOUNTY / FRANCIS
+    # =========================
 
-            all_products.extend(products)
+    driver = start_driver()
 
-            time.sleep(random.uniform(1.0, 2.2))
+    try:
+        for category, terms in SEARCH_TERMS.items():
+            for term in terms:
+                products = extract_products_from_francis_bounty(
+                    driver,
+                    category,
+                    term,
+                    max_pages=3
+                )
+
+                all_products.extend(products)
+
+                time.sleep(random.uniform(1.0, 2.2))
+
+    finally:
+        driver.quit()
 
     raw_df = pd.DataFrame(all_products)
 
@@ -1305,7 +1322,6 @@ def main():
         return
 
     normalized_df = normalize_dataframe(raw_df)
-
     # ==========================================
     # REMOVE NON-PRODUCT RECORDS
     # ==========================================
