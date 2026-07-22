@@ -99,12 +99,12 @@ def start_driver():
     options.add_argument("--window-size=1440,1200")
     options.add_argument(
         "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
     )
 
     driver = uc.Chrome(
         options=options,
-        version_main=148,
+        version_main=150,
         use_subprocess=True
     )
 

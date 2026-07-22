@@ -45,7 +45,7 @@ SEARCH_TERMS = get_market_search_terms("Aruba")
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "Chrome/148.0 Safari/537.36"
+        "Chrome/150.0 Safari/537.36"
     )
 }
 
